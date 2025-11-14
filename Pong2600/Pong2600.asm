@@ -4,6 +4,7 @@
 	include "xmacro.h"
         
 SpriteHeight	equ 33
+SpriteHeightBig	equ 50
 ColorP0		equ $48
 ColorP1		equ $a8
 ScoreToWin	equ $20
@@ -15,6 +16,10 @@ ScoreToWin	equ $20
 	org $80
 
 Temp		.byte
+
+; Game mode variable
+GameMode	.byte	; 0 = normal, 1 = fast ball, 2 = big paddles
+GameSelectDebounce .byte ; debounce for game select switch
 
 ; Horizontal position players 2 bytes
 HorizPosPlayer0	.byte
@@ -70,6 +75,8 @@ Start
         sta BallDirCounter
         sta ScoredPlayer0
         sta PlayerWin
+        sta GameMode
+        sta GameSelectDebounce
         lda #0
         sta CountScoreFrame
         
@@ -112,6 +119,33 @@ Start
 NextFrame
         lsr SWCHB	; test Game Reset switch
         bcc Start	; reset?
+
+; Check Game Select switch
+        lda SWCHB
+        and #%00000010	; test Game Select switch
+        bne GameSelectNotPressed
+        lda GameSelectDebounce
+        bne GameSelectNotPressed
+        ; Game Select was pressed
+        lda #15
+        sta GameSelectDebounce
+        inc GameMode
+        lda GameMode
+        cmp #3		; we have 3 modes (0, 1, 2)
+        bcc GameSelectDone
+        lda #0
+        sta GameMode
+GameSelectDone
+        ; Visual feedback: change playfield color based on mode
+        ldx GameMode
+        lda GameModeColors,x
+        sta COLUPF
+        jmp GameSelectNotPressed
+GameSelectNotPressed
+        lda GameSelectDebounce
+        beq NoDebounceDecrement
+        dec GameSelectDebounce
+NoDebounceDecrement
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 1 + 3 lines of VSYNC
@@ -237,6 +271,22 @@ ScanLoop1a
         
         lda PlayerWin
         bne Finished
+        
+        ; Set sprite size and colors based on game mode
+        lda GameMode
+        cmp #2
+        bne NormalSizeInGame
+        ; Mode 2: Big paddles
+        lda #%00000101	; double width sprites
+        sta NUSIZ0
+        sta NUSIZ1
+        jmp SizeDoneInGame
+NormalSizeInGame
+        lda #%00010000	; normal size with 2 pixel ball
+        sta NUSIZ0
+        lda #%00000000
+        sta NUSIZ1
+SizeDoneInGame
         
         lda #ColorP0
         sta COLUP0	; set color for left
@@ -410,9 +460,19 @@ NoHitLeftWall
         bvc DecX
         
         inc BallPosX
+        ; Check game mode for fast ball (mode 1)
+        lda GameMode
+        cmp #1
+        bne XDirection
+        inc BallPosX	; move ball twice as fast in mode 1
         jmp XDirection
 DecX
 	dec BallPosX
+        ; Check game mode for fast ball (mode 1)
+        lda GameMode
+        cmp #1
+        bne XDirection
+        dec BallPosX	; move ball twice as fast in mode 1
 XDirection
 
 
@@ -674,6 +734,12 @@ GetBCDBitmap subroutine
 	rts
 
 	org $F700
+
+; Game mode colors for visual feedback
+GameModeColors
+        .byte $C2	; Mode 0: Normal - cyan
+        .byte $46	; Mode 1: Fast ball - red  
+        .byte $D6	; Mode 2: Big paddles - purple
 
 ; Bitmap pattern for digits
 DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
