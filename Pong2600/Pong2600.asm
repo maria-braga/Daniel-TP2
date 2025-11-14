@@ -602,17 +602,23 @@ P1VertOK1
   	lda #2
         sta PosPlayer0
 P0VertOK1
-      
-      	lda PosPlayer1
-        cmp #$7C
+      	; Calculate max position based on sprite height
+        ; Max position = 160 - 4 (game field) - CurrentSpriteHeight
+        lda #160-4
+        sec
+        sbc CurrentSpriteHeight
+        sta Temp	; Store max position in Temp
+        
+        lda PosPlayer1
+        cmp Temp
         bmi P1VertOK2
-        lda #$7B
+        lda Temp
         sta PosPlayer1         
 P1VertOK2
       	lda PosPlayer0
-        cmp #$7C
+        cmp Temp
         bmi P0VertOK2
-        lda #$7b
+        lda Temp
         sta PosPlayer0 
 P0VertOK2
 
