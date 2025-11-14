@@ -1,8 +1,7 @@
-
 	processor 6502
-        include "vcs.h"
-        include "macro.h"
-        include "xmacro.h"
+	include "vcs.h"
+	include "macro.h"
+	include "xmacro.h"
         
 SpriteHeight	equ 33
 ColorP0		equ $48
@@ -16,6 +15,10 @@ ScoreToWin	equ $20
 	org $80
 
 Temp		.byte
+
+; Horizontal position players 2 bytes
+HorizPosPlayer0	.byte
+HorizPosPlayer1	.byte
 
 ; Vertical position players 2 bytes
 PosPlayer0	.byte
@@ -55,6 +58,12 @@ Start
         sta PosPlayer0
         lda #37
         sta PosPlayer1  
+
+        ; Initialize horizontal positions
+        lda #10
+        sta HorizPosPlayer0
+        lda #148
+        sta HorizPosPlayer1
 
         lda #0
         sta BallDirection
@@ -133,13 +142,13 @@ NextFrame
         ldx #4
         jsr SetHorizPos
         
-        ; Set horizontal position player 1
+        ; Set horizontal position player 0 (using variable)
         ldx #0
-        lda #10
+        lda HorizPosPlayer0
         jsr SetHorizPos
-        ; Set horizontal position player 2
+        ; Set horizontal position player 1 (using variable)
         ldx #1
-        lda #148
+        lda HorizPosPlayer1
         jsr SetHorizPos
         
        	sta WSYNC
@@ -418,33 +427,53 @@ YDirection
         lda #%00000010
         sta BallEnable
 
+; Player 0 movement (vertical and horizontal)
         lda SWCHA
-        and #%00010000
-        bne NoMov
+        and #%00010000  ; Down
+        bne NoMovP0Down
         inc PosPlayer0
         inc PosPlayer0
-NoMov
+NoMovP0Down
 	lda SWCHA
-        and #%00100000
-        bne NoMov2
+        and #%00100000  ; Up
+        bne NoMovP0Up
         dec PosPlayer0
         dec PosPlayer0
-NoMov2
-
+NoMovP0Up
         lda SWCHA
-        and #%00000001
-        bne NoMov3
-        inc PosPlayer1
-        inc PosPlayer1
-   
-NoMov3
+        and #%01000000  ; Left
+        bne NoMovP0Left
+        dec HorizPosPlayer0
+NoMovP0Left
+        lda SWCHA
+        and #%10000000  ; Right
+        bne NoMovP0Right
+        inc HorizPosPlayer0
+NoMovP0Right
 
+; Player 1 movement (vertical and horizontal)
+        lda SWCHA
+        and #%00000001  ; Down
+        bne NoMovP1Down
+        inc PosPlayer1
+        inc PosPlayer1
+NoMovP1Down
 	lda SWCHA
-        and #%00000010
-        bne NoMov4
+        and #%00000010  ; Up
+        bne NoMovP1Up
         dec PosPlayer1
         dec PosPlayer1
-NoMov4
+NoMovP1Up
+        lda SWCHA
+        and #%00000100  ; Left
+        bne NoMovP1Left
+        dec HorizPosPlayer1
+NoMovP1Left
+        lda SWCHA
+        and #%00001000  ; Right
+        bne NoMovP1Right
+        inc HorizPosPlayer1
+NoMovP1Right
 	jmp CheckMovement
 
 NoCheckMovement
@@ -452,35 +481,61 @@ NoCheckMovement
         sta BallEnable
 CheckMovement
 
-; Verifies that players do not move outside the limits
+; Verifies that players do not move outside the vertical limits
 	lda PosPlayer1
         cmp #2
-        bpl OK
+        bpl P1VertOK1
   	lda #2
         sta PosPlayer1
-OK
-
+P1VertOK1
 	lda PosPlayer0
         cmp #2
-        bpl OK2
+        bpl P0VertOK1
   	lda #2
         sta PosPlayer0
-OK2
-      
+P0VertOK1
       
       	lda PosPlayer1
         cmp #$7C
-        bmi OK3
+        bmi P1VertOK2
         lda #$7B
         sta PosPlayer1         
-OK3
-
+P1VertOK2
       	lda PosPlayer0
         cmp #$7C
-        bmi OK4
+        bmi P0VertOK2
         lda #$7b
         sta PosPlayer0 
-OK4
+P0VertOK2
+
+; Verifies that players do not move outside the horizontal limits
+; Player 0 (left side): minimum 10, maximum 75 (middle of screen)
+	lda HorizPosPlayer0
+        cmp #10
+        bpl P0HorizOK1
+        lda #10
+        sta HorizPosPlayer0
+P0HorizOK1
+	lda HorizPosPlayer0
+        cmp #75
+        bmi P0HorizOK2
+        lda #75
+        sta HorizPosPlayer0
+P0HorizOK2
+
+; Player 1 (right side): minimum 85 (middle of screen), maximum 148
+	lda HorizPosPlayer1
+        cmp #85
+        bpl P1HorizOK1
+        lda #85
+        sta HorizPosPlayer1
+P1HorizOK1
+	lda HorizPosPlayer1
+        cmp #148
+        bmi P1HorizOK2
+        lda #148
+        sta HorizPosPlayer1
+P1HorizOK2
 
 ; Checking collisions between ball and players
 
