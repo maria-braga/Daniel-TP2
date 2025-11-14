@@ -3,8 +3,8 @@
 	include "macro.h"
 	include "xmacro.h"
         
-SpriteHeight	equ 33
-SpriteHeightBig	equ 50  ; altura maior para big paddles
+SpriteHeight	equ 25
+SpriteHeightBig	equ 42  ; altura maior para big paddles
 ColorP0		equ $48
 ColorP1		equ $a8
 ScoreToWin	equ $20
@@ -18,7 +18,7 @@ ScoreToWin	equ $20
 Temp		.byte
 
 ; Game mode variable
-GameMode	.byte	; 0 = normal, 1 = fast ball, 2 = big paddles
+GameMode	.byte	; 0 = normal, 1 = fast ball, 2 = small paddles
 GameSelectDebounce .byte ; debounce for game select switch
 CurrentSpriteHeight .byte ; altura atual dos sprites
 CurrentSpritePtr .word ; ponteiro para o sprite atual (low byte, high byte)
@@ -284,7 +284,7 @@ ScanLoop1a
         lda GameMode
         cmp #2
         bne NormalSizeInGame
-        ; Mode 2: Big paddles (altura aumentada e sprite diferente)
+        ; Mode 2: Small paddles (altura aumentada e sprite diferente)
         lda #SpriteHeight
         sta CurrentSpriteHeight
         lda #<PlayerSprite
@@ -760,7 +760,7 @@ GetBCDBitmap subroutine
 GameModeColors
         .byte $C2	; Mode 0: Normal - cyan
         .byte $46	; Mode 1: Fast ball - red  
-        .byte $D6	; Mode 2: Big paddles - purple
+        .byte $D6	; Mode 2: Small paddles - purple
 
 ; Bitmap pattern for digits
 DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
@@ -777,7 +777,7 @@ DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
         
 ;---Graphics Data from PlayerPal 2600---
 
-; Player graphics data - MODO NORMAL (33 linhas)
+; Player graphics data - MODO Small (30 linhas)
 PlayerSprite
         .byte #%00000000;-- linha 0
         .byte #%00011000;-- linha 1
@@ -794,11 +794,6 @@ PlayerSprite
         .byte #%01111110;-- linha 12
         .byte #%01111110;-- linha 13
         .byte #%01111110;-- linha 14
-        .byte #%01111110;-- linha 15
-        .byte #%01111110;-- linha 16
-        .byte #%01111110;-- linha 17
-        .byte #%01111110;-- linha 18
-        .byte #%01111110;-- linha 19
         .byte #%01111110;-- linha 20
         .byte #%01111110;-- linha 21
         .byte #%01111110;-- linha 22
@@ -808,12 +803,9 @@ PlayerSprite
         .byte #%01111110;-- linha 26
         .byte #%00111100;-- linha 27
         .byte #%00111100;-- linha 28
-        .byte #%01111110;-- linha 29
-        .byte #%00111100;-- linha 30
-        .byte #%00111100;-- linha 31
-        .byte #%00011000;-- linha 32
+        .byte #%00011000;-- linha 29
 
-; Player graphics data - MODO BIG PADDLES (50 linhas - sem afunilamento)
+; Player graphics data - MODO Normal PADDLES (42 linhas - sem afunilamento)
 PlayerSpriteBig
         .byte #%00000000;-- linha 0
         .byte #%00011000;-- linha 1
@@ -845,9 +837,9 @@ PlayerSpriteBig
         .byte #%01111110;-- linha 27
         .byte #%01111110;-- linha 28
         .byte #%01111110;-- linha 29
-        .byte #%01111110;-- linha 30 (continua largo)
-        .byte #%01111110;-- linha 31 (continua largo)
-        .byte #%01111110;-- linha 32 (continua largo)
+        .byte #%01111110;-- linha 30
+        .byte #%01111110;-- linha 31
+        .byte #%01111110;-- linha 32
         .byte #%01111110;-- linha 33
         .byte #%01111110;-- linha 34
         .byte #%01111110;-- linha 35
@@ -855,16 +847,8 @@ PlayerSpriteBig
         .byte #%01111110;-- linha 37
         .byte #%01111110;-- linha 38
         .byte #%01111110;-- linha 39
-        .byte #%01111110;-- linha 40
-        .byte #%01111110;-- linha 41
-        .byte #%01111110;-- linha 42
-        .byte #%01111110;-- linha 43
-        .byte #%01111110;-- linha 44
-        .byte #%01111110;-- linha 45
-        .byte #%01111110;-- linha 46
-        .byte #%01111110;-- linha 47
-        .byte #%00111100;-- linha 48
-        .byte #%00011000;-- linha 49
+        .byte #%00111100;-- linha 40
+        .byte #%00011000;-- linha 41
         
         
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
