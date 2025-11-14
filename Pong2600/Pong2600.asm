@@ -171,6 +171,10 @@ NoDebounceDecrement
         
         lda #0
         sta AUDV0
+        lda #4
+        sta AUDC0
+        lda #5
+        sta AUDF0
         
         lda #%0000001
 	sta CTRLPF
@@ -445,7 +449,14 @@ SetWin0
         sta BallPosX
         lda BallDirection
         eor #%01000000
-        sta BallDirection        
+        sta BallDirection
+        ; Sound when scoring
+        lda #12
+        sta AUDV0
+        lda #8
+        sta AUDC0
+        lda #10
+        sta AUDF0
         clc
         lda Score0
         adc #1
@@ -472,7 +483,14 @@ SetWin1
 	sta BallPosX        
         lda BallDirection
         eor #%01000000
-        sta BallDirection        
+        sta BallDirection
+        ; Sound when scoring
+        lda #10
+        sta AUDV0
+        lda #5
+        sta AUDC0
+        lda #7
+        sta AUDF0
         clc
         lda Score1
         adc #1
