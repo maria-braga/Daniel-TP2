@@ -773,7 +773,7 @@ GameModeColors
 
 ; Game field line colors for each mode
 GameFieldLineColors
-        .byte $7	; Mode 0: Normal - green
+        .byte $0D       ; Mode 0: Normal - white
         .byte $28	; Mode 1: Fast ball - orange
         .byte $EA	; Mode 2: Small paddles - green
 
