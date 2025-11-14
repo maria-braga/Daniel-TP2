@@ -419,60 +419,62 @@
 ------- FILE Pong2600.asm
       5  0000 ????
       6  0000 ????	       00 21	   SpriteHeight equ	33
-      7  0000 ????	       00 48	   ColorP0    equ	$48
-      8  0000 ????	       00 a8	   ColorP1    equ	$a8
-      9  0000 ????	       00 20	   ScoreToWin equ	$20
-     10  0000 ????
-     11  0000 ????						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     12  0000 ????						; Variables segment
-     13  0000 ????
-     14 U009e ????				      seg.u	Variables
-     15 U0080					      org	$80
-     16 U0080
-     17 U0080		       00	   Temp       .byte.b
-     18 U0081
-     19 U0081							; Game mode variable
-     20 U0081		       00	   GameMode   .byte.b		; 0 = normal, 1 = fast ball, 2 = big paddles, 3 = invisible ball
-     21 U0082		       00	   GameSelectDebounce .byte.b		; debounce for game select switch
-     22 U0083		       00	   InvisibleCounter .byte.b		; counter for invisible ball mode
-     23 U0084
-     24 U0084							; Horizontal position players 2 bytes
-     25 U0084		       00	   HorizPosPlayer0 .byte.b
-     26 U0085		       00	   HorizPosPlayer1 .byte.b
-     27 U0086
-     28 U0086							; Vertical position players 2 bytes
-     29 U0086		       00	   PosPlayer0 .byte.b
-     30 U0087		       00	   PosPlayer1 .byte.b
-     31 U0088
-     32 U0088							; For scoreboard 17 bytes
-     33 U0088		       00	   Score0     .byte.b		; BCD score of player 0
-     34 U0089		       00	   Score1     .byte.b		; BCD score of player 1
-     35 U008a		       00 00 00 00*FontBuf    .ds	10	; 2x5 array of playfield bytes
-     36 U0094		       00	   ColorScoreP0 .byte.b
-     37 U0095		       00	   ColorScoreP1 .byte.b
-     38 U0096		       00	   CountScoreFrame .byte.b
-     39 U0097		       00	   ScoredPlayer0 .byte.b		; 0 scored player 0, 1 scored player 1
-     40 U0098		       00	   PlayerWin  .byte.b
-     41 U0099
-     42 U0099							; Ball coordinates and direction 5 bytes
-     43 U0099		       00	   BallPosX   .byte.b
-     44 U009a		       00	   BallPosY   .byte.b
-     45 U009b		       00	   BallDirection .byte.b		; Byte 7 y dir - bit 6 for x dir
-     46 U009c		       00	   BallDirCounter .byte.b
-     47 U009d		       00	   BallEnable .byte.b
-     48 U009e
-     49 U009e
-     50 U009e							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     51 U009e							; Code segment
-     52 U009e
-     53  f800 ????				      seg	Code
-     54  f000					      org	$f000
-     55  f000
-     56  f000
-     57  f000							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     58  f000							; Start and Initialization
+      7  0000 ????	       00 32	   SpriteHeightBig equ	50	; altura maior para big paddles
+      8  0000 ????	       00 48	   ColorP0    equ	$48
+      9  0000 ????	       00 a8	   ColorP1    equ	$a8
+     10  0000 ????	       00 20	   ScoreToWin equ	$20
+     11  0000 ????
+     12  0000 ????						;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     13  0000 ????						; Variables segment
+     14  0000 ????
+     15 U00a0 ????				      seg.u	Variables
+     16 U0080					      org	$80
+     17 U0080
+     18 U0080		       00	   Temp       .byte.b
+     19 U0081
+     20 U0081							; Game mode variable
+     21 U0081		       00	   GameMode   .byte.b		; 0 = normal, 1 = fast ball, 2 = big paddles
+     22 U0082		       00	   GameSelectDebounce .byte.b		; debounce for game select switch
+     23 U0083		       00	   CurrentSpriteHeight .byte.b		; altura atual dos sprites
+     24 U0084		       00 00	   CurrentSpritePtr .word.w		; ponteiro para o sprite atual (low byte, high byte)
+     25 U0086
+     26 U0086							; Horizontal position players 2 bytes
+     27 U0086		       00	   HorizPosPlayer0 .byte.b
+     28 U0087		       00	   HorizPosPlayer1 .byte.b
+     29 U0088
+     30 U0088							; Vertical position players 2 bytes
+     31 U0088		       00	   PosPlayer0 .byte.b
+     32 U0089		       00	   PosPlayer1 .byte.b
+     33 U008a
+     34 U008a							; For scoreboard 17 bytes
+     35 U008a		       00	   Score0     .byte.b		; BCD score of player 0
+     36 U008b		       00	   Score1     .byte.b		; BCD score of player 1
+     37 U008c		       00 00 00 00*FontBuf    .ds	10	; 2x5 array of playfield bytes
+     38 U0096		       00	   ColorScoreP0 .byte.b
+     39 U0097		       00	   ColorScoreP1 .byte.b
+     40 U0098		       00	   CountScoreFrame .byte.b
+     41 U0099		       00	   ScoredPlayer0 .byte.b		; 0 scored player 0, 1 scored player 1
+     42 U009a		       00	   PlayerWin  .byte.b
+     43 U009b
+     44 U009b							; Ball coordinates and direction 5 bytes
+     45 U009b		       00	   BallPosX   .byte.b
+     46 U009c		       00	   BallPosY   .byte.b
+     47 U009d		       00	   BallDirection .byte.b		; Byte 7 y dir - bit 6 for x dir
+     48 U009e		       00	   BallDirCounter .byte.b
+     49 U009f		       00	   BallEnable .byte.b
+     50 U00a0
+     51 U00a0
+     52 U00a0							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     53 U00a0							; Code segment
+     54 U00a0
+     55  f800 ????				      seg	Code
+     56  f000					      org	$f000
+     57  f000
+     58  f000
      59  f000							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-     60  f000				   Start
+     60  f000							; Start and Initialization
+     61  f000							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+     62  f000				   Start
       0  f000					      CLEAN_START
       1  f000		       78		      sei
       2  f001		       d8		      cld
@@ -485,250 +487,240 @@
       9  f008		       48		      pha
      10  f009		       d0 fb		      bne	.CLEAR_STACK
      11  f00b
-     62  f00b
-     63  f00b							; Configure joystick ports as inputs (CRITICAL!)
-     64  f00b		       a9 00		      lda	#0
-     65  f00d		       8d 81 02 	      sta	SWACNT	; Set all joystick pins as inputs
-     66  f010
-     67  f010		       a9 50		      lda	#80
-     68  f012		       85 86		      sta	PosPlayer0
-     69  f014		       a9 25		      lda	#37
-     70  f016		       85 87		      sta	PosPlayer1
-     71  f018
-     72  f018							; Initialize horizontal positions
-     73  f018		       a9 0a		      lda	#10
-     74  f01a		       85 84		      sta	HorizPosPlayer0
-     75  f01c		       a9 94		      lda	#148
-     76  f01e		       85 85		      sta	HorizPosPlayer1
-     77  f020
-     78  f020		       a9 00		      lda	#0
-     79  f022		       85 9b		      sta	BallDirection
-     80  f024		       85 9c		      sta	BallDirCounter
-     81  f026		       85 97		      sta	ScoredPlayer0
-     82  f028		       85 98		      sta	PlayerWin
-     83  f02a		       85 81		      sta	GameMode
-     84  f02c		       85 82		      sta	GameSelectDebounce
-     85  f02e		       85 83		      sta	InvisibleCounter
-     86  f030		       a9 00		      lda	#0
-     87  f032		       85 96		      sta	CountScoreFrame
-     88  f034
-     89  f034		       a9 02		      lda	#%00000010
-     90  f036		       85 9d		      sta	BallEnable
-     91  f038
-     92  f038		       a9 48		      lda	#ColorP0
-     93  f03a		       85 94		      sta	ColorScoreP0
-     94  f03c		       85 06		      sta	COLUP0
-     95  f03e		       a9 a8		      lda	#ColorP1
-     96  f040		       85 95		      sta	ColorScoreP1
-     97  f042		       85 07		      sta	COLUP1
-     98  f044
-     99  f044		       a9 10		      lda	#%00010000
-    100  f046		       85 04		      sta	NUSIZ0
-    101  f048
-    102  f048		       a9 32		      lda	#50
-    103  f04a		       85 99		      sta	BallPosX
-    104  f04c
-    105  f04c		       a9 8c		      lda	#140
-    106  f04e		       85 9a		      sta	BallPosY
-    107  f050
-    108  f050		       a9 02		      lda	#%00000010
-    109  f052		       85 1f		      sta	ENABL
-    110  f054
-    111  f054		       a9 00		      lda	#0
-    112  f056		       85 19		      sta	AUDV0
-    113  f058		       a9 04		      lda	#4
-    114  f05a		       85 15		      sta	AUDC0
-    115  f05c		       a9 05		      lda	#5
-    116  f05e		       85 17		      sta	AUDF0
-    117  f060
-    118  f060		       a9 01		      lda	#1
-    119  f062		       85 26		      sta	VDELP1
-    120  f064
-    121  f064
-    122  f064							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    123  f064							; Game Loop
-    124  f064							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    125  f064				   NextFrame
-    126  f064		       4e 82 02 	      lsr	SWCHB	; test Game Reset switch
-    127  f067		       90 97		      bcc	Start	; reset?
-    128  f069
-    129  f069							; Check Game Select switch
-    130  f069		       ad 82 02 	      lda	SWCHB
-    131  f06c		       29 02		      and	#%00000010	; test Game Select switch
-    132  f06e		       d0 1e		      bne	GameSelectNotPressed
-    133  f070		       a5 82		      lda	GameSelectDebounce
-    134  f072		       d0 1a		      bne	GameSelectNotPressed
-    135  f074							; Game Select was pressed
-    136  f074		       a9 0f		      lda	#15
-    137  f076		       85 82		      sta	GameSelectDebounce
-    138  f078		       e6 81		      inc	GameMode
-    139  f07a		       a5 81		      lda	GameMode
-    140  f07c		       c9 04		      cmp	#4	; we have 4 modes (0, 1, 2, 3)
-    141  f07e		       90 04		      bcc	GameSelectDone
-    142  f080		       a9 00		      lda	#0
-    143  f082		       85 81		      sta	GameMode
-    144  f084				   GameSelectDone
-    145  f084							; Visual feedback: change playfield color based on mode
-    146  f084		       a6 81		      ldx	GameMode
-    147  f086		       bd 00 f7 	      lda	GameModeColors,x
-    148  f089		       85 08		      sta	COLUPF
-    149  f08b		       4c 8e f0 	      jmp	GameSelectNotPressed
-    150  f08e				   GameSelectNotPressed
-    151  f08e		       a5 82		      lda	GameSelectDebounce
-    152  f090		       f0 02		      beq	NoDebounceDecrement
-    153  f092		       c6 82		      dec	GameSelectDebounce
-    154  f094				   NoDebounceDecrement
-    155  f094
-    156  f094							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    157  f094							; 1 + 3 lines of VSYNC
-      0  f094					      VERTICAL_SYNC
-      1  f094		       a9 0e		      lda	#%1110
-      2  f096		       85 02	   .VSLP1     sta	WSYNC
-      3  f098		       85 00		      sta	VSYNC
-      4  f09a		       4a		      lsr
-      5  f09b		       d0 f9		      bne	.VSLP1
-    159  f09d
-    160  f09d							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    161  f09d							; 37 lines of underscan
-      0  f09d					      TIMER_SETUP	37
-      1  f09d				   .lines     SET	37
-      2  f09d				   .cycles    SET	((.lines * 76) - 13)
-      3  f09d
-      4  f09d
-      5  f09d				  -	      if	(.cycles % 64) < 12
-      6  f09d				  -	      lda	#(.cycles / 64) - 1
-      7  f09d				  -	      sta	WSYNC
-      8  f09d					      else
-      9  f09d		       a9 2b		      lda	#(.cycles / 64)
-     10  f09f		       85 02		      sta	WSYNC
-     11  f0a1					      endif
-     12  f0a1		       8d 96 02 	      sta	TIM64T
-    163  f0a4
-    164  f0a4		       a9 00		      lda	#0
-    165  f0a6		       85 19		      sta	AUDV0
-    166  f0a8
-    167  f0a8		       a9 01		      lda	#%0000001
-    168  f0aa		       85 0a		      sta	CTRLPF
-    169  f0ac
-    170  f0ac		       a9 c2		      lda	#$C2
-    171  f0ae		       85 08		      sta	COLUPF
-    172  f0b0
-    173  f0b0		       a5 88		      lda	Score0
-    174  f0b2		       a2 00		      ldx	#0
-    175  f0b4		       20 c7 f3 	      jsr	GetBCDBitmap
-    176  f0b7		       a5 89		      lda	Score1
-    177  f0b9		       a2 05		      ldx	#5
-    178  f0bb		       20 c7 f3 	      jsr	GetBCDBitmap
-    179  f0be
-    180  f0be
-    181  f0be		       a5 99		      lda	BallPosX
-    182  f0c0		       a2 04		      ldx	#4
-    183  f0c2		       20 57 f7 	      jsr	SetHorizPos
-    184  f0c5
-    185  f0c5							; Set horizontal position player 0 (using variable)
-    186  f0c5		       a2 00		      ldx	#0
-    187  f0c7		       a5 84		      lda	HorizPosPlayer0
-    188  f0c9		       20 57 f7 	      jsr	SetHorizPos
-    189  f0cc							; Set horizontal position player 1 (using variable)
-    190  f0cc		       a2 01		      ldx	#1
-    191  f0ce		       a5 85		      lda	HorizPosPlayer1
-    192  f0d0		       20 57 f7 	      jsr	SetHorizPos
-    193  f0d3
-    194  f0d3		       85 02		      sta	WSYNC
-    195  f0d5		       85 2a		      sta	HMOVE
-    196  f0d7
-      0  f0d7					      TIMER_WAIT
-      1  f0d7				   .waittimer
-      2  f0d7		       ad 84 02 	      lda	INTIM
-      3  f0da		       d0 fb		      bne	.waittimer
-      4  f0dc		       85 02		      sta	WSYNC
-    198  f0de
-    199  f0de							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    200  f0de							; 192 lines of frame
-    201  f0de
-    202  f0de							; First part playfield
-    203  f0de
-    204  f0de
-    205  f0de							; First, we'll draw the scoreboard.
-    206  f0de							; Put the playfield into score mode (bit 2) which gives
-    207  f0de							; two different colors for the left/right side of
-    208  f0de							; the playfield (given by COLUP0 and COLUP1).
-    209  f0de
-    210  f0de							; Now we draw all four digits.
-    211  f0de
-    212  f0de		       a9 01		      lda	#%0000001
-    213  f0e0		       85 0a		      sta	CTRLPF
-    214  f0e2
-    215  f0e2		       a9 ff		      lda	#%11111111
-    216  f0e4		       85 0e		      sta	PF1
-    217  f0e6		       85 0f		      sta	PF2
-    218  f0e8
-    219  f0e8		       a9 cf		      lda	#%11001111
-    220  f0ea		       85 0d		      sta	PF0
-    221  f0ec		       85 02		      sta	WSYNC
-    222  f0ee		       a9 ef		      lda	#%11101111
-    223  f0f0		       85 0d		      sta	PF0
-    224  f0f2		       85 02		      sta	WSYNC
-    225  f0f4
-    226  f0f4		       a9 ff		      lda	#%11111111
-    227  f0f6		       85 0d		      sta	PF0
-    228  f0f8
-    229  f0f8					      REPEAT	4
-    230  f0f8		       85 02		      sta	WSYNC
-    229  f0f8					      REPEND
-    230  f0fa		       85 02		      sta	WSYNC
-    229  f0fa					      REPEND
-    230  f0fc		       85 02		      sta	WSYNC
-    229  f0fc					      REPEND
-    230  f0fe		       85 02		      sta	WSYNC
-    231  f100					      REPEND
-    232  f100
-    233  f100		       a0 00		      ldy	#0	; Y will contain the frame Y coordinate
-    234  f102		       84 0d		      sty	PF0
-    235  f104		       84 0e		      sty	PF1
-    236  f106		       84 0f		      sty	PF2
-    237  f108		       a9 12		      lda	#%00010010	; score mode + 2 pixel ball
-    238  f10a		       85 0a		      sta	CTRLPF
-    239  f10c		       a5 94		      lda	ColorScoreP0
-    240  f10e		       85 06		      sta	COLUP0	; set color for left
-    241  f110		       a5 95		      lda	ColorScoreP1
-    242  f112		       85 07		      sta	COLUP1	; set color for right
-    243  f114		       85 02		      sta	WSYNC
-    244  f116				   ScanLoop1a
-    245  f116		       85 02		      sta	WSYNC
-    246  f118		       98		      tya
-    247  f119		       4a		      lsr		; divide Y by two for double-height lines
-    248  f11a		       aa		      tax		; -> X
-    249  f11b		       b5 8a		      lda	FontBuf+0,x
-    250  f11d		       85 0e		      sta	PF1	; set left score bitmap
-      0  f11f					      SLEEP	24
-      1  f11f				   .CYCLES    SET	24
-      2  f11f
-      3  f11f				  -	      IF	.CYCLES < 2
-      4  f11f				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
-      5  f11f				  -	      ERR
-      6  f11f					      ENDIF
-      7  f11f
-      8  f11f				  -	      IF	.CYCLES & 1
-      9  f11f				  -	      IFNCONST	NO_ILLEGAL_OPCODES
-     10  f11f				  -	      nop	0
-     11  f11f				  -	      ELSE
-     12  f11f				  -	      bit	VSYNC
-     13  f11f				  -	      ENDIF
-     14  f11f				  -.CYCLES    SET	.CYCLES - 3
-     15  f11f					      ENDIF
-     16  f11f
-     17  f11f					      REPEAT	.CYCLES / 2
-     18  f11f		       ea		      nop
-     17  f11f					      REPEND
-     18  f120		       ea		      nop
-     17  f120					      REPEND
-     18  f121		       ea		      nop
-     17  f121					      REPEND
-     18  f122		       ea		      nop
-     17  f122					      REPEND
-     18  f123		       ea		      nop
-     17  f123					      REPEND
+     64  f00b		       a9 50		      lda	#80
+     65  f00d		       85 88		      sta	PosPlayer0
+     66  f00f		       a9 25		      lda	#37
+     67  f011		       85 89		      sta	PosPlayer1
+     68  f013
+     69  f013							; Initialize horizontal positions
+     70  f013		       a9 0a		      lda	#10
+     71  f015		       85 86		      sta	HorizPosPlayer0
+     72  f017		       a9 94		      lda	#148
+     73  f019		       85 87		      sta	HorizPosPlayer1
+     74  f01b
+     75  f01b		       a9 00		      lda	#0
+     76  f01d		       85 9d		      sta	BallDirection
+     77  f01f		       85 9e		      sta	BallDirCounter
+     78  f021		       85 99		      sta	ScoredPlayer0
+     79  f023		       85 9a		      sta	PlayerWin
+     80  f025		       85 81		      sta	GameMode
+     81  f027		       85 82		      sta	GameSelectDebounce
+     82  f029		       a9 21		      lda	#SpriteHeight
+     83  f02b		       85 83		      sta	CurrentSpriteHeight
+     84  f02d		       a9 35		      lda	#<PlayerSprite
+     85  f02f		       85 84		      sta	CurrentSpritePtr
+     86  f031		       a9 f7		      lda	#>PlayerSprite
+     87  f033		       85 85		      sta	CurrentSpritePtr+1
+     88  f035		       a9 00		      lda	#0
+     89  f037		       85 98		      sta	CountScoreFrame
+     90  f039
+     91  f039		       a9 02		      lda	#%00000010
+     92  f03b		       85 9f		      sta	BallEnable
+     93  f03d
+     94  f03d		       a9 48		      lda	#ColorP0
+     95  f03f		       85 96		      sta	ColorScoreP0
+     96  f041		       85 06		      sta	COLUP0
+     97  f043		       a9 a8		      lda	#ColorP1
+     98  f045		       85 97		      sta	ColorScoreP1
+     99  f047		       85 07		      sta	COLUP1
+    100  f049
+    101  f049		       a9 10		      lda	#%00010000
+    102  f04b		       85 04		      sta	NUSIZ0
+    103  f04d
+    104  f04d		       a9 32		      lda	#50
+    105  f04f		       85 9b		      sta	BallPosX
+    106  f051
+    107  f051		       a9 8c		      lda	#140
+    108  f053		       85 9c		      sta	BallPosY
+    109  f055
+    110  f055		       a9 02		      lda	#%00000010
+    111  f057		       85 1f		      sta	ENABL
+    112  f059
+    113  f059		       a9 00		      lda	#0
+    114  f05b		       85 19		      sta	AUDV0
+    115  f05d		       a9 04		      lda	#4
+    116  f05f		       85 15		      sta	AUDC0
+    117  f061		       a9 05		      lda	#5
+    118  f063		       85 17		      sta	AUDF0
+    119  f065
+    120  f065		       a9 01		      lda	#1
+    121  f067		       85 26		      sta	VDELP1
+    122  f069
+    123  f069
+    124  f069							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    125  f069							; Game Loop
+    126  f069							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    127  f069				   NextFrame
+    128  f069		       4e 82 02 	      lsr	SWCHB	; test Game Reset switch
+    129  f06c		       90 92		      bcc	Start	; reset?
+    130  f06e
+    131  f06e							; Check Game Select switch
+    132  f06e		       ad 82 02 	      lda	SWCHB
+    133  f071		       29 02		      and	#%00000010	; test Game Select switch
+    134  f073		       d0 1e		      bne	GameSelectNotPressed
+    135  f075		       a5 82		      lda	GameSelectDebounce
+    136  f077		       d0 1a		      bne	GameSelectNotPressed
+    137  f079							; Game Select was pressed
+    138  f079		       a9 0f		      lda	#15
+    139  f07b		       85 82		      sta	GameSelectDebounce
+    140  f07d		       e6 81		      inc	GameMode
+    141  f07f		       a5 81		      lda	GameMode
+    142  f081		       c9 03		      cmp	#3	; we have 3 modes (0, 1, 2)
+    143  f083		       90 04		      bcc	GameSelectDone
+    144  f085		       a9 00		      lda	#0
+    145  f087		       85 81		      sta	GameMode
+    146  f089				   GameSelectDone
+    147  f089							; Visual feedback: change playfield color based on mode
+    148  f089		       a6 81		      ldx	GameMode
+    149  f08b		       bd 00 f7 	      lda	GameModeColors,x
+    150  f08e		       85 08		      sta	COLUPF
+    151  f090		       4c 93 f0 	      jmp	GameSelectNotPressed
+    152  f093				   GameSelectNotPressed
+    153  f093		       a5 82		      lda	GameSelectDebounce
+    154  f095		       f0 02		      beq	NoDebounceDecrement
+    155  f097		       c6 82		      dec	GameSelectDebounce
+    156  f099				   NoDebounceDecrement
+    157  f099
+    158  f099							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    159  f099							; 1 + 3 lines of VSYNC
+      0  f099					      VERTICAL_SYNC
+      1  f099		       a9 0e		      lda	#%1110
+      2  f09b		       85 02	   .VSLP1     sta	WSYNC
+      3  f09d		       85 00		      sta	VSYNC
+      4  f09f		       4a		      lsr
+      5  f0a0		       d0 f9		      bne	.VSLP1
+    161  f0a2
+    162  f0a2							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    163  f0a2							; 37 lines of underscan
+      0  f0a2					      TIMER_SETUP	37
+      1  f0a2				   .lines     SET	37
+      2  f0a2				   .cycles    SET	((.lines * 76) - 13)
+      3  f0a2
+      4  f0a2
+      5  f0a2				  -	      if	(.cycles % 64) < 12
+      6  f0a2				  -	      lda	#(.cycles / 64) - 1
+      7  f0a2				  -	      sta	WSYNC
+      8  f0a2					      else
+      9  f0a2		       a9 2b		      lda	#(.cycles / 64)
+     10  f0a4		       85 02		      sta	WSYNC
+     11  f0a6					      endif
+     12  f0a6		       8d 96 02 	      sta	TIM64T
+    165  f0a9
+    166  f0a9		       a9 00		      lda	#0
+    167  f0ab		       85 19		      sta	AUDV0
+    168  f0ad
+    169  f0ad		       a9 01		      lda	#%0000001
+    170  f0af		       85 0a		      sta	CTRLPF
+    171  f0b1
+    172  f0b1		       a9 c2		      lda	#$C2
+    173  f0b3		       85 08		      sta	COLUPF
+    174  f0b5
+    175  f0b5		       a5 8a		      lda	Score0
+    176  f0b7		       a2 00		      ldx	#0
+    177  f0b9		       20 c8 f3 	      jsr	GetBCDBitmap
+    178  f0bc		       a5 8b		      lda	Score1
+    179  f0be		       a2 05		      ldx	#5
+    180  f0c0		       20 c8 f3 	      jsr	GetBCDBitmap
+    181  f0c3
+    182  f0c3
+    183  f0c3		       a5 9b		      lda	BallPosX
+    184  f0c5		       a2 04		      ldx	#4
+    185  f0c7		       20 88 f7 	      jsr	SetHorizPos
+    186  f0ca
+    187  f0ca							; Set horizontal position player 0 (using variable)
+    188  f0ca		       a2 00		      ldx	#0
+    189  f0cc		       a5 86		      lda	HorizPosPlayer0
+    190  f0ce		       20 88 f7 	      jsr	SetHorizPos
+    191  f0d1							; Set horizontal position player 1 (using variable)
+    192  f0d1		       a2 01		      ldx	#1
+    193  f0d3		       a5 87		      lda	HorizPosPlayer1
+    194  f0d5		       20 88 f7 	      jsr	SetHorizPos
+    195  f0d8
+    196  f0d8		       85 02		      sta	WSYNC
+    197  f0da		       85 2a		      sta	HMOVE
+    198  f0dc
+      0  f0dc					      TIMER_WAIT
+      1  f0dc				   .waittimer
+      2  f0dc		       ad 84 02 	      lda	INTIM
+      3  f0df		       d0 fb		      bne	.waittimer
+      4  f0e1		       85 02		      sta	WSYNC
+    200  f0e3
+    201  f0e3							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    202  f0e3							; 192 lines of frame
+    203  f0e3
+    204  f0e3							; First part playfield
+    205  f0e3
+    206  f0e3
+    207  f0e3							; First, we'll draw the scoreboard.
+    208  f0e3							; Put the playfield into score mode (bit 2) which gives
+    209  f0e3							; two different colors for the left/right side of
+    210  f0e3							; the playfield (given by COLUP0 and COLUP1).
+    211  f0e3
+    212  f0e3							; Now we draw all four digits.
+    213  f0e3
+    214  f0e3		       a9 01		      lda	#%0000001
+    215  f0e5		       85 0a		      sta	CTRLPF
+    216  f0e7
+    217  f0e7		       a9 ff		      lda	#%11111111
+    218  f0e9		       85 0e		      sta	PF1
+    219  f0eb		       85 0f		      sta	PF2
+    220  f0ed
+    221  f0ed		       a9 cf		      lda	#%11001111
+    222  f0ef		       85 0d		      sta	PF0
+    223  f0f1		       85 02		      sta	WSYNC
+    224  f0f3		       a9 ef		      lda	#%11101111
+    225  f0f5		       85 0d		      sta	PF0
+    226  f0f7		       85 02		      sta	WSYNC
+    227  f0f9
+    228  f0f9		       a9 ff		      lda	#%11111111
+    229  f0fb		       85 0d		      sta	PF0
+    230  f0fd
+    231  f0fd					      REPEAT	4
+    232  f0fd		       85 02		      sta	WSYNC
+    231  f0fd					      REPEND
+    232  f0ff		       85 02		      sta	WSYNC
+    231  f0ff					      REPEND
+    232  f101		       85 02		      sta	WSYNC
+    231  f101					      REPEND
+    232  f103		       85 02		      sta	WSYNC
+    233  f105					      REPEND
+    234  f105
+    235  f105		       a0 00		      ldy	#0	; Y will contain the frame Y coordinate
+    236  f107		       84 0d		      sty	PF0
+    237  f109		       84 0e		      sty	PF1
+    238  f10b		       84 0f		      sty	PF2
+    239  f10d		       a9 12		      lda	#%00010010	; score mode + 2 pixel ball
+    240  f10f		       85 0a		      sta	CTRLPF
+    241  f111		       a5 96		      lda	ColorScoreP0
+    242  f113		       85 06		      sta	COLUP0	; set color for left
+    243  f115		       a5 97		      lda	ColorScoreP1
+    244  f117		       85 07		      sta	COLUP1	; set color for right
+    245  f119		       85 02		      sta	WSYNC
+    246  f11b				   ScanLoop1a
+    247  f11b		       85 02		      sta	WSYNC
+    248  f11d		       98		      tya
+    249  f11e		       4a		      lsr		; divide Y by two for double-height lines
+    250  f11f		       aa		      tax		; -> X
+    251  f120		       b5 8c		      lda	FontBuf+0,x
+    252  f122		       85 0e		      sta	PF1	; set left score bitmap
+      0  f124					      SLEEP	24
+      1  f124				   .CYCLES    SET	24
+      2  f124
+      3  f124				  -	      IF	.CYCLES < 2
+      4  f124				  -	      ECHO	"MACRO ERROR: 'SLEEP': Duration must be > 1"
+      5  f124				  -	      ERR
+      6  f124					      ENDIF
+      7  f124
+      8  f124				  -	      IF	.CYCLES & 1
+      9  f124				  -	      IFNCONST	NO_ILLEGAL_OPCODES
+     10  f124				  -	      nop	0
+     11  f124				  -	      ELSE
+     12  f124				  -	      bit	VSYNC
+     13  f124				  -	      ENDIF
+     14  f124				  -.CYCLES    SET	.CYCLES - 3
+     15  f124					      ENDIF
+     16  f124
+     17  f124					      REPEAT	.CYCLES / 2
      18  f124		       ea		      nop
      17  f124					      REPEND
      18  f125		       ea		      nop
@@ -742,662 +734,717 @@
      18  f129		       ea		      nop
      17  f129					      REPEND
      18  f12a		       ea		      nop
-     19  f12b					      REPEND
-    252  f12b		       b5 8f		      lda	FontBuf+5,x
-    253  f12d		       85 0e		      sta	PF1	; set right score bitmap
-    254  f12f		       c8		      iny
-    255  f130		       c0 0a		      cpy	#10
-    256  f132		       90 e2		      bcc	ScanLoop1a
-    257  f134
-    258  f134
-      0  f134					      TIMER_SETUP	9
-      1  f134				   .lines     SET	9
-      2  f134				   .cycles    SET	((.lines * 76) - 13)
-      3  f134
-      4  f134
-      5  f134				  -	      if	(.cycles % 64) < 12
-      6  f134				  -	      lda	#(.cycles / 64) - 1
-      7  f134				  -	      sta	WSYNC
-      8  f134					      else
-      9  f134		       a9 0a		      lda	#(.cycles / 64)
-     10  f136		       85 02		      sta	WSYNC
-     11  f138					      endif
-     12  f138		       8d 96 02 	      sta	TIM64T
-    260  f13b
-    261  f13b		       a9 00		      lda	#0	; Y will contain the frame Y coordinate
-    262  f13d		       85 0d		      sta	PF0
-    263  f13f		       85 0e		      sta	PF1
-    264  f141		       85 0f		      sta	PF2
-    265  f143
-    266  f143		       85 02		      sta	WSYNC
-    267  f145		       85 02		      sta	WSYNC
-    268  f147
-    269  f147		       a9 11		      lda	#%00010001
-    270  f149		       85 0a		      sta	CTRLPF
-    271  f14b		       a9 c2		      lda	#$C2
-    272  f14d		       85 08		      sta	COLUPF
-    273  f14f		       a9 ff		      lda	#%11111111
-    274  f151		       85 0d		      sta	PF0
-    275  f153		       85 0e		      sta	PF1
-    276  f155		       85 0f		      sta	PF2
-    277  f157
-    278  f157		       a5 98		      lda	PlayerWin
-    279  f159		       d0 1f		      bne	Finished
-    280  f15b
-    281  f15b							; Set sprite size and colors based on game mode
-    282  f15b		       a5 81		      lda	GameMode
-    283  f15d		       c9 02		      cmp	#2
-    284  f15f		       d0 09		      bne	NormalSizeInGame
-    285  f161							; Mode 2: Big paddles
-    286  f161		       a9 05		      lda	#%00000101	; double width sprites
-    287  f163		       85 04		      sta	NUSIZ0
-    288  f165		       85 05		      sta	NUSIZ1
-    289  f167		       4c 72 f1 	      jmp	SizeDoneInGame
-    290  f16a				   NormalSizeInGame
-    291  f16a		       a9 10		      lda	#%00010000	; normal size with 2 pixel ball
-    292  f16c		       85 04		      sta	NUSIZ0
-    293  f16e		       a9 00		      lda	#%00000000
-    294  f170		       85 05		      sta	NUSIZ1
-    295  f172				   SizeDoneInGame
-    296  f172
-    297  f172		       a9 48		      lda	#ColorP0
-    298  f174		       85 06		      sta	COLUP0	; set color for left
-    299  f176		       a9 a8		      lda	#ColorP1
-    300  f178		       85 07		      sta	COLUP1	; set color for right
-    301  f17a
-    302  f17a				   Finished
-    303  f17a
-      0  f17a					      TIMER_WAIT
-      1  f17a				   .waittimer
-      2  f17a		       ad 84 02 	      lda	INTIM
-      3  f17d		       d0 fb		      bne	.waittimer
-      4  f17f		       85 02		      sta	WSYNC
-    305  f181
-    306  f181
-    307  f181							; Section game field
-    308  f181		       a2 9c		      ldx	#160-4
-    309  f183
-    310  f183		       a9 0e		      lda	#$0E
-    311  f185		       85 08		      sta	COLUPF
-    312  f187
-    313  f187		       a9 00		      lda	#0
-    314  f189		       85 0e		      sta	PF1
-    315  f18b		       a9 10		      lda	#%00010000
-    316  f18d		       85 0d		      sta	PF0
-    317  f18f		       a9 80		      lda	#%10000000
-    318  f191		       85 0f		      sta	PF2
-    319  f193		       85 02		      sta	WSYNC
-    320  f195				   Loop
-    321  f195
-    322  f195							; Draw ball
-    323  f195		       85 02		      STA	WSYNC
-    324  f197
-    325  f197		       8a		      txa		; X -> A
-    326  f198		       a0 00		      ldy	#%00000000
-    327  f19a		       38		      sec		; set carry for subtract
-    328  f19b		       e5 9a		      sbc	BallPosY	; local coordinate
-    329  f19d		       c9 04		      cmp	#4	; in sprite?
-    330  f19f		       b0 13		      bcs	SetBall	; yes, skip over next
-    331  f1a1
-    332  f1a1							; Check for invisible ball mode (mode 3)
-    333  f1a1		       a5 81		      lda	GameMode
-    334  f1a3		       c9 03		      cmp	#3
-    335  f1a5		       d0 06		      bne	NormalBall
-    336  f1a7		       a5 83		      lda	InvisibleCounter
-    337  f1a9		       29 20		      and	#%00100000	; check bit 5 to toggle visibility
-    338  f1ab		       d0 05		      bne	HideBall
-    339  f1ad				   NormalBall
-    340  f1ad		       a4 9d		      ldy	BallEnable	; lookup frame data
-    341  f1af		       4c b4 f1 	      jmp	SetBall
-    342  f1b2				   HideBall
-    343  f1b2		       a0 00		      ldy	#%00000000
-    344  f1b4				   SetBall
-    345  f1b4		       84 1f		      sty	ENABL	; store bitmap
-    346  f1b6
-    347  f1b6							; Draw Sprites
-    348  f1b6
-    349  f1b6							; Sprite 1
-    350  f1b6		       8a		      txa		; X -> A
-    351  f1b7		       38		      sec		; set carry for subtract
-    352  f1b8		       e5 87		      sbc	PosPlayer1	; local coordinate
-    353  f1ba		       c9 21		      cmp	#SpriteHeight	; in sprite?
-    354  f1bc		       90 02		      bcc	InSprite1	; yes, skip over next
-    355  f1be		       a9 00		      lda	#0	; not in sprite, load 0
-    356  f1c0				   InSprite1
-    357  f1c0		       a8		      tay		; local coord -> Y
-    358  f1c1		       b9 36 f7 	      lda	PlayerSprite,y	; lookup frame data
-    359  f1c4		       85 1c		      sta	GRP1	; store bitmap
-    360  f1c6
-    361  f1c6							; Sprite 0
-    362  f1c6		       8a		      txa		; X -> A
-    363  f1c7		       38		      sec		; set carry for subtract
-    364  f1c8		       e5 86		      sbc	PosPlayer0	; local coordinate
-    365  f1ca		       c9 21		      cmp	#SpriteHeight	; in sprite?
-    366  f1cc		       90 02		      bcc	InSprite0	; yes, skip over next
-    367  f1ce		       a9 00		      lda	#0	; not in sprite, load 0
-    368  f1d0				   InSprite0
-    369  f1d0		       a8		      tay		; local coord -> Y
-    370  f1d1		       b9 36 f7 	      lda	PlayerSprite,y	; lookup frame data
-    371  f1d4		       85 1b		      sta	GRP0	; store bitmap
-    372  f1d6
-    373  f1d6		       ca		      dex
-    374  f1d7		       d0 bc		      bne	Loop
-    375  f1d9
-    376  f1d9
-    377  f1d9							; Lower part of the playfield
-    378  f1d9		       a9 c2		      lda	#$C2
-    379  f1db		       85 08		      sta	COLUPF
-    380  f1dd
-    381  f1dd		       a9 ff		      lda	#%11111111
-    382  f1df		       85 0e		      sta	PF1
-    383  f1e1		       85 0d		      sta	PF0
-    384  f1e3		       85 0f		      sta	PF2
-    385  f1e5
-    386  f1e5					      REPEAT	5
-    387  f1e5		       85 02		      sta	WSYNC
-    386  f1e5					      REPEND
-    387  f1e7		       85 02		      sta	WSYNC
-    386  f1e7					      REPEND
-    387  f1e9		       85 02		      sta	WSYNC
-    386  f1e9					      REPEND
-    387  f1eb		       85 02		      sta	WSYNC
-    386  f1eb					      REPEND
-    387  f1ed		       85 02		      sta	WSYNC
-    388  f1ef					      REPEND
-    389  f1ef
-    390  f1ef		       a9 ef		      lda	#%11101111
-    391  f1f1		       85 0d		      sta	PF0
-    392  f1f3		       85 02		      sta	WSYNC
-    393  f1f5		       a9 cf		      lda	#%11001111
-    394  f1f7		       85 0d		      sta	PF0
-    395  f1f9		       85 02		      sta	WSYNC
-    396  f1fb
-    397  f1fb
-    398  f1fb							; Clear playfield
-    399  f1fb		       a9 00		      lda	#0
-    400  f1fd		       85 0d		      sta	PF0
-    401  f1ff		       85 0e		      sta	PF1
-    402  f201		       85 0f		      sta	PF2
-    403  f203
-    404  f203		       85 02		      sta	WSYNC
-    405  f205		       85 02		      sta	WSYNC
-    406  f207
-    407  f207
-    408  f207							; 29 lines of overscan
-      0  f207					      TIMER_SETUP	29
-      1  f207				   .lines     SET	29
-      2  f207				   .cycles    SET	((.lines * 76) - 13)
-      3  f207
-      4  f207
-      5  f207				  -	      if	(.cycles % 64) < 12
-      6  f207				  -	      lda	#(.cycles / 64) - 1
-      7  f207				  -	      sta	WSYNC
-      8  f207					      else
-      9  f207		       a9 22		      lda	#(.cycles / 64)
-     10  f209		       85 02		      sta	WSYNC
-     11  f20b					      endif
-     12  f20b		       8d 96 02 	      sta	TIM64T
-    410  f20e
-    411  f20e
-    412  f20e							; Checking collisions between ball and left/right limit
-    413  f20e							; Also updating ball positiona and score if necessary
-    414  f20e
-    415  f20e		       f8		      sed
-    416  f20f		       a5 99		      lda	BallPosX
-    417  f211		       c9 9b		      cmp	#$9B	; Check if >= 155 (was hitting exactly 157)
-    418  f213		       90 28		      bcc	NoHitRightWall
-    419  f215		       a9 00		      lda	#0
-    420  f217		       85 97		      sta	ScoredPlayer0
-    421  f219		       a5 88		      lda	Score0
-    422  f21b		       c9 20		      cmp	#ScoreToWin
-    423  f21d		       d0 09		      bne	NotWonYet0
-    424  f21f		       a9 01		      lda	#1
-    425  f221		       85 98		      sta	PlayerWin
-    426  f223		       a9 a0		      lda	#160
-    427  f225		       4c 2a f2 	      jmp	SetWin0
-    428  f228				   NotWonYet0
-    429  f228		       a9 14		      lda	#20
-    430  f22a				   SetWin0
-    431  f22a		       85 96		      sta	CountScoreFrame
-    432  f22c		       a9 64		      lda	#100
-    433  f22e		       85 99		      sta	BallPosX
-    434  f230		       a5 9b		      lda	BallDirection
-    435  f232		       49 40		      eor	#%01000000
-    436  f234		       85 9b		      sta	BallDirection
-    437  f236		       18		      clc
-    438  f237		       a5 88		      lda	Score0
-    439  f239		       69 01		      adc	#1
-    440  f23b		       85 88		      sta	Score0
-    441  f23d				   NoHitRightWall
-    442  f23d
-    443  f23d		       a5 99		      lda	BallPosX
-    444  f23f		       c9 0a		      cmp	#10	; Check if <= 10 (was hitting exactly 8)
-    445  f241		       b0 28		      bcs	NoHitLeftWall
-    446  f243		       a9 01		      lda	#1
-    447  f245		       85 97		      sta	ScoredPlayer0
-    448  f247		       a5 89		      lda	Score1
-    449  f249		       c9 20		      cmp	#ScoreToWin
-    450  f24b		       d0 09		      bne	NotWonYet1
-    451  f24d		       a9 01		      lda	#1
-    452  f24f		       85 98		      sta	PlayerWin
-    453  f251		       a9 a0		      lda	#160
-    454  f253		       4c 58 f2 	      jmp	SetWin1
-    455  f256				   NotWonYet1
-    456  f256		       a9 14		      lda	#20
-    457  f258				   SetWin1
-    458  f258		       85 96		      sta	CountScoreFrame
-    459  f25a		       a9 32		      lda	#50
-    460  f25c		       85 99		      sta	BallPosX
-    461  f25e		       a5 9b		      lda	BallDirection
-    462  f260		       49 40		      eor	#%01000000
-    463  f262		       85 9b		      sta	BallDirection
-    464  f264		       18		      clc
-    465  f265		       a5 89		      lda	Score1
-    466  f267		       69 01		      adc	#1
-    467  f269		       85 89		      sta	Score1
-    468  f26b				   NoHitLeftWall
-    469  f26b		       d8		      cld
-    470  f26c
-    471  f26c							; Handles players movement
-    472  f26c
-    473  f26c		       a5 96		      lda	CountScoreFrame
-    474  f26e		       f0 03		      beq	ContinueMovement
-    475  f270		       4c f8 f2 	      jmp	NoCheckMovement
-    476  f273				   ContinueMovement
-    477  f273
-    478  f273							; Checks ball movements
-    479  f273		       24 9b		      bit	BallDirection
-    480  f275		       50 0d		      bvc	DecX
-    481  f277
-    482  f277		       e6 99		      inc	BallPosX
-    483  f279							; Check game mode for fast ball (mode 1)
-    484  f279		       a5 81		      lda	GameMode
-    485  f27b		       c9 01		      cmp	#1
-    486  f27d		       d0 0f		      bne	XDirection
-    487  f27f		       e6 99		      inc	BallPosX	; move ball twice as fast in mode 1
-    488  f281		       4c 8e f2 	      jmp	XDirection
-    489  f284				   DecX
-    490  f284		       c6 99		      dec	BallPosX
-    491  f286							; Check game mode for fast ball (mode 1)
-    492  f286		       a5 81		      lda	GameMode
-    493  f288		       c9 01		      cmp	#1
-    494  f28a		       d0 02		      bne	XDirection
-    495  f28c		       c6 99		      dec	BallPosX	; move ball twice as fast in mode 1
-    496  f28e				   XDirection
-    497  f28e
-    498  f28e							; Update invisible counter for mode 3
-    499  f28e		       a5 81		      lda	GameMode
-    500  f290		       c9 03		      cmp	#3
-    501  f292		       d0 02		      bne	NoInvisibleUpdate
-    502  f294		       e6 83		      inc	InvisibleCounter
-    503  f296				   NoInvisibleUpdate
-    504  f296
-    505  f296		       24 9b		      bit	BallDirection
-    506  f298		       10 05		      bpl	DecY
-    507  f29a		       e6 9a		      inc	BallPosY
-    508  f29c		       4c a1 f2 	      jmp	YDirection
-    509  f29f				   DecY
-    510  f29f		       c6 9a		      dec	BallPosY
-    511  f2a1				   YDirection
-    512  f2a1
-    513  f2a1		       a9 02		      lda	#%00000010
-    514  f2a3		       85 9d		      sta	BallEnable
-    515  f2a5
-    516  f2a5							; Player 0 movement (vertical and horizontal)
-    517  f2a5		       ad 80 02 	      lda	SWCHA
-    518  f2a8		       29 10		      and	#%00010000	; Down
-    519  f2aa		       d0 04		      bne	NoMovP0Down
-    520  f2ac		       e6 86		      inc	PosPlayer0
-    521  f2ae		       e6 86		      inc	PosPlayer0
-    522  f2b0				   NoMovP0Down
-    523  f2b0		       ad 80 02 	      lda	SWCHA
-    524  f2b3		       29 20		      and	#%00100000	; Up
-    525  f2b5		       d0 04		      bne	NoMovP0Up
-    526  f2b7		       c6 86		      dec	PosPlayer0
-    527  f2b9		       c6 86		      dec	PosPlayer0
-    528  f2bb				   NoMovP0Up
-    529  f2bb		       ad 80 02 	      lda	SWCHA
-    530  f2be		       29 40		      and	#%01000000	; Left
-    531  f2c0		       d0 02		      bne	NoMovP0Left
-    532  f2c2		       c6 84		      dec	HorizPosPlayer0
-    533  f2c4				   NoMovP0Left
-    534  f2c4		       ad 80 02 	      lda	SWCHA
-    535  f2c7		       29 80		      and	#%10000000	; Right
-    536  f2c9		       d0 02		      bne	NoMovP0Right
-    537  f2cb		       e6 84		      inc	HorizPosPlayer0
-    538  f2cd				   NoMovP0Right
-    539  f2cd
-    540  f2cd							; Player 1 movement (vertical and horizontal)
-    541  f2cd		       ad 80 02 	      lda	SWCHA
-    542  f2d0		       29 01		      and	#%00000001	; Down
-    543  f2d2		       d0 04		      bne	NoMovP1Down
-    544  f2d4		       e6 87		      inc	PosPlayer1
-    545  f2d6		       e6 87		      inc	PosPlayer1
-    546  f2d8				   NoMovP1Down
-    547  f2d8		       ad 80 02 	      lda	SWCHA
-    548  f2db		       29 02		      and	#%00000010	; Up
-    549  f2dd		       d0 04		      bne	NoMovP1Up
-    550  f2df		       c6 87		      dec	PosPlayer1
-    551  f2e1		       c6 87		      dec	PosPlayer1
-    552  f2e3				   NoMovP1Up
-    553  f2e3		       ad 80 02 	      lda	SWCHA
-    554  f2e6		       29 04		      and	#%00000100	; Left
-    555  f2e8		       d0 02		      bne	NoMovP1Left
-    556  f2ea		       c6 85		      dec	HorizPosPlayer1
-    557  f2ec				   NoMovP1Left
-    558  f2ec		       ad 80 02 	      lda	SWCHA
-    559  f2ef		       29 08		      and	#%00001000	; Right
-    560  f2f1		       d0 02		      bne	NoMovP1Right
-    561  f2f3		       e6 85		      inc	HorizPosPlayer1
-    562  f2f5				   NoMovP1Right
-    563  f2f5		       4c fc f2 	      jmp	CheckMovement
-    564  f2f8
-    565  f2f8				   NoCheckMovement
-    566  f2f8		       a9 00		      lda	#%00000000
-    567  f2fa		       85 9d		      sta	BallEnable
-    568  f2fc				   CheckMovement
-    569  f2fc
-    570  f2fc							; Verifies that players do not move outside the vertical limits
-    571  f2fc		       a5 87		      lda	PosPlayer1
-    572  f2fe		       c9 02		      cmp	#2
-    573  f300		       10 04		      bpl	P1VertOK1
-    574  f302		       a9 02		      lda	#2
-    575  f304		       85 87		      sta	PosPlayer1
-    576  f306				   P1VertOK1
-    577  f306		       a5 86		      lda	PosPlayer0
-    578  f308		       c9 02		      cmp	#2
-    579  f30a		       10 04		      bpl	P0VertOK1
-    580  f30c		       a9 02		      lda	#2
-    581  f30e		       85 86		      sta	PosPlayer0
-    582  f310				   P0VertOK1
-    583  f310
-    584  f310		       a5 87		      lda	PosPlayer1
-    585  f312		       c9 7c		      cmp	#$7C
-    586  f314		       30 04		      bmi	P1VertOK2
-    587  f316		       a9 7b		      lda	#$7B
-    588  f318		       85 87		      sta	PosPlayer1
-    589  f31a				   P1VertOK2
-    590  f31a		       a5 86		      lda	PosPlayer0
-    591  f31c		       c9 7c		      cmp	#$7C
-    592  f31e		       30 04		      bmi	P0VertOK2
-    593  f320		       a9 7b		      lda	#$7b
-    594  f322		       85 86		      sta	PosPlayer0
-    595  f324				   P0VertOK2
-    596  f324
-    597  f324							; Verifies that players do not move outside the horizontal limits
-    598  f324							; Player 0 (left side): minimum 10, maximum 75 (middle of screen)
-    599  f324		       a5 84		      lda	HorizPosPlayer0
-    600  f326		       c9 0a		      cmp	#10
-    601  f328		       10 04		      bpl	P0HorizOK1
-    602  f32a		       a9 0a		      lda	#10
-    603  f32c		       85 84		      sta	HorizPosPlayer0
-    604  f32e				   P0HorizOK1
-    605  f32e		       a5 84		      lda	HorizPosPlayer0
-    606  f330		       c9 4b		      cmp	#75
-    607  f332		       30 04		      bmi	P0HorizOK2
-    608  f334		       a9 4b		      lda	#75
-    609  f336		       85 84		      sta	HorizPosPlayer0
-    610  f338				   P0HorizOK2
-    611  f338
-    612  f338							; Player 1 (right side): minimum 85 (middle of screen), maximum 148
-    613  f338		       a5 85		      lda	HorizPosPlayer1
-    614  f33a		       c9 55		      cmp	#85
-    615  f33c		       10 04		      bpl	P1HorizOK1
-    616  f33e		       a9 55		      lda	#85
-    617  f340		       85 85		      sta	HorizPosPlayer1
-    618  f342				   P1HorizOK1
-    619  f342		       a5 85		      lda	HorizPosPlayer1
-    620  f344		       c9 94		      cmp	#148
-    621  f346		       30 04		      bmi	P1HorizOK2
-    622  f348		       a9 94		      lda	#148
-    623  f34a		       85 85		      sta	HorizPosPlayer1
-    624  f34c				   P1HorizOK2
-    625  f34c
-    626  f34c							; Checking collisions between ball and players
-    627  f34c
-    628  f34c		       a5 9c		      lda	BallDirCounter
-    629  f34e		       d0 27		      bne	DoNotCheckPlayerHitBall
-    630  f350
-    631  f350		       24 02		      bit	CXP0FB
-    632  f352		       50 0e		      bvc	NoHitPlayer0
-    633  f354		       a9 0a		      lda	#10
-    634  f356		       85 9c		      sta	BallDirCounter
-    635  f358		       a5 9b		      lda	BallDirection
-    636  f35a		       49 40		      eor	#%01000000
-    637  f35c		       85 9b		      sta	BallDirection
-    638  f35e		       a9 0a		      lda	#10
-    639  f360		       85 19		      sta	AUDV0
-    640  f362				   NoHitPlayer0
-    641  f362
-    642  f362		       24 03		      bit	CXP1FB
-    643  f364		       50 0e		      bvc	NoHitPlayer1
-    644  f366		       a9 0a		      lda	#10
-    645  f368		       85 9c		      sta	BallDirCounter
-    646  f36a		       a5 9b		      lda	BallDirection
-    647  f36c		       49 40		      eor	#%01000000
-    648  f36e		       85 9b		      sta	BallDirection
-    649  f370		       a9 06		      lda	#6
-    650  f372		       85 19		      sta	AUDV0
-    651  f374				   NoHitPlayer1
-    652  f374		       4c 79 f3 	      jmp	NoBallCounterDec
-    653  f377
-    654  f377				   DoNotCheckPlayerHitBall
-    655  f377		       c6 9c		      dec	BallDirCounter
-    656  f379				   NoBallCounterDec
-    657  f379
-    658  f379							; Reset collition status
-    659  f379		       85 2c		      sta	CXCLR
-    660  f37b
-    661  f37b
-    662  f37b							; Checking collisions between ball and top/bottom wall
-    663  f37b
-    664  f37b		       a5 9a		      lda	BallPosY
-    665  f37d		       c9 9a		      cmp	#154
-    666  f37f		       d0 0a		      bne	NoHitTopWall
-    667  f381		       a5 9b		      lda	BallDirection
-    668  f383		       49 80		      eor	#%10000000
-    669  f385		       85 9b		      sta	BallDirection
-    670  f387		       a9 06		      lda	#6
-    671  f389		       85 19		      sta	AUDV0
-    672  f38b				   NoHitTopWall
-    673  f38b
-    674  f38b		       a5 9a		      lda	BallPosY
-    675  f38d		       c9 02		      cmp	#2
-    676  f38f		       d0 0a		      bne	NoHitBottomWall
-    677  f391		       a5 9b		      lda	BallDirection
-    678  f393		       49 80		      eor	#%10000000
-    679  f395		       85 9b		      sta	BallDirection
-    680  f397		       a9 06		      lda	#6
-    681  f399		       85 19		      sta	AUDV0
-    682  f39b				   NoHitBottomWall
-    683  f39b
-    684  f39b		       a5 96		      lda	CountScoreFrame
-    685  f39d		       f0 10		      beq	NoActionScore
-    686  f39f		       c6 96		      dec	CountScoreFrame
-    687  f3a1		       d0 07		      bne	NoCheckWin
-    688  f3a3		       a5 98		      lda	PlayerWin
-    689  f3a5		       f0 03		      beq	NoCheckWin
-    690  f3a7		       4c 00 f0 	      jmp	Start
-    691  f3aa				   NoCheckWin
-    692  f3aa		       a4 97		      ldy	ScoredPlayer0
-    693  f3ac		       4c ba f3 	      jmp	SetScoreColor
-    694  f3af
-    695  f3af				   NoActionScore
-    696  f3af		       a9 48		      lda	#$48
-    697  f3b1		       85 94		      sta	ColorScoreP0
-    698  f3b3		       a9 a8		      lda	#$a8
-    699  f3b5		       85 95		      sta	ColorScoreP1
-    700  f3b7		       4c bd f3 	      jmp	ScoreCheckCompleted
-    701  f3ba				   SetScoreColor
-    702  f3ba		       99 94 00 	      sta	ColorScoreP0,y
-    703  f3bd				   ScoreCheckCompleted
-    704  f3bd
-      0  f3bd					      TIMER_WAIT
-      1  f3bd				   .waittimer
-      2  f3bd		       ad 84 02 	      lda	INTIM
-      3  f3c0		       d0 fb		      bne	.waittimer
-      4  f3c2		       85 02		      sta	WSYNC
-    706  f3c4
-    707  f3c4							; total = 262 lines, go to next frame
-    708  f3c4		       4c 64 f0 	      jmp	NextFrame
-    709  f3c7
-    710  f3c7
-    711  f3c7							; Fetches bitmap data for two digits of a
-    712  f3c7							; BCD-encoded number, storing it in addresses
-    713  f3c7							; FontBuf+x to FontBuf+4+x.
-    714  f3c7				   GetBCDBitmap subroutine
-    715  f3c7							; First fetch the bytes for the 1st digit
-    716  f3c7		       48		      pha		; save original BCD number
-    717  f3c8		       29 0f		      and	#$0F	; mask out the least significant digit
-    718  f3ca		       85 80		      sta	Temp
-    719  f3cc		       0a		      asl
-    720  f3cd		       0a		      asl
-    721  f3ce		       65 80		      adc	Temp	; multiply by 5
-    722  f3d0		       a8		      tay		; -> Y
-    723  f3d1		       a9 05		      lda	#5
-    724  f3d3		       85 80		      sta	Temp	; count down from 5
-    725  f3d5				   .loop1
-    726  f3d5		       b9 04 f7 	      lda	DigitsBitmap,y
-    727  f3d8		       29 0f		      and	#$0F	; mask out leftmost digit
-    728  f3da		       95 8a		      sta	FontBuf,x	; store leftmost digit
-    729  f3dc		       c8		      iny
-    730  f3dd		       e8		      inx
-    731  f3de		       c6 80		      dec	Temp
-    732  f3e0		       d0 f3		      bne	.loop1
-    733  f3e2							; Now do the 2nd digit
-    734  f3e2		       68		      pla		; restore original BCD number
-    735  f3e3		       4a		      lsr
-    736  f3e4		       4a		      lsr
-    737  f3e5		       4a		      lsr
-    738  f3e6		       4a		      lsr		; shift right by 4 (in BCD, divide by 10)
-    739  f3e7		       85 80		      sta	Temp
-    740  f3e9		       0a		      asl
-    741  f3ea		       0a		      asl
-    742  f3eb		       65 80		      adc	Temp	; multiply by 5
-    743  f3ed		       a8		      tay		; -> Y
-    744  f3ee		       ca		      dex
-    745  f3ef		       ca		      dex
-    746  f3f0		       ca		      dex
-    747  f3f1		       ca		      dex
-    748  f3f2		       ca		      dex		; subtract 5 from X (reset to original)
-    749  f3f3		       a9 05		      lda	#5
-    750  f3f5		       85 80		      sta	Temp	; count down from 5
-    751  f3f7				   .loop2
-    752  f3f7		       b9 04 f7 	      lda	DigitsBitmap,y
-    753  f3fa		       29 f0		      and	#$F0	; mask out leftmost digit
-    754  f3fc		       15 8a		      ora	FontBuf,x	; combine left and right digits
-    755  f3fe		       95 8a		      sta	FontBuf,x	; store combined digits
-    756  f400		       c8		      iny
-    757  f401		       e8		      inx
-    758  f402		       c6 80		      dec	Temp
-    759  f404		       d0 f1		      bne	.loop2
-    760  f406		       60		      rts
-    761  f407
-    762  f700					      org	$F700
-    763  f700
-    764  f700							; Game mode colors for visual feedback
-    765  f700				   GameModeColors
-    766  f700		       c2		      .byte.b	$C2	; Mode 0: Normal - cyan
-    767  f701		       46		      .byte.b	$46	; Mode 1: Fast ball - red
-    768  f702		       d6		      .byte.b	$D6	; Mode 2: Big paddles - purple
-    769  f703		       0e		      .byte.b	$0E	; Mode 3: Invisible ball - white
-    770  f704
-    771  f704							; Bitmap pattern for digits
-    772  f704				   DigitsBitmap 		;;{w:8,h:5,count:10,brev:1};;
-    773  f704		       ee aa aa aa*	      .byte.b	$EE,$AA,$AA,$AA,$EE
-    774  f709		       22 22 22 22*	      .byte.b	$22,$22,$22,$22,$22
-    775  f70e		       ee 22 ee 88*	      .byte.b	$EE,$22,$EE,$88,$EE
-    776  f713		       ee 22 66 22*	      .byte.b	$EE,$22,$66,$22,$EE
-    777  f718		       aa aa ee 22*	      .byte.b	$AA,$AA,$EE,$22,$22
-    778  f71d		       ee 88 ee 22*	      .byte.b	$EE,$88,$EE,$22,$EE
-    779  f722		       ee 88 ee aa*	      .byte.b	$EE,$88,$EE,$AA,$EE
-    780  f727		       ee 22 22 22*	      .byte.b	$EE,$22,$22,$22,$22
-    781  f72c		       ee aa ee aa*	      .byte.b	$EE,$AA,$EE,$AA,$EE
-    782  f731		       ee aa ee 22*	      .byte.b	$EE,$AA,$EE,$22,$EE
-    783  f736
-    784  f736							;---Graphics Data from PlayerPal 2600---
-    785  f736
-    786  f736							; Player graphics data
-    787  f736				   PlayerSprite
-    788  f736		       00		      .byte.b	#%00000000	;--
-    789  f737		       18		      .byte.b	#%00011000	;--
-    790  f738		       3c		      .byte.b	#%00111100	;--
-    791  f739		       3c		      .byte.b	#%00111100	;--
-    792  f73a		       7e		      .byte.b	#%01111110	;--
-    793  f73b		       7e		      .byte.b	#%01111110	;--
-    794  f73c		       7e		      .byte.b	#%01111110	;--
-    795  f73d		       7e		      .byte.b	#%01111110	;--
-    796  f73e		       7e		      .byte.b	#%01111110	;--
-    797  f73f		       7e		      .byte.b	#%01111110	;--
-    798  f740		       7e		      .byte.b	#%01111110	;--
-    799  f741		       7e		      .byte.b	#%01111110	;--
-    800  f742		       7e		      .byte.b	#%01111110	;--
-    801  f743		       7e		      .byte.b	#%01111110	;--
-    802  f744		       7e		      .byte.b	#%01111110	;--
-    803  f745		       7e		      .byte.b	#%01111110	;--
-    804  f746		       7e		      .byte.b	#%01111110	;--
-    805  f747		       7e		      .byte.b	#%01111110	;--
-    806  f748		       7e		      .byte.b	#%01111110	;--
-    807  f749		       7e		      .byte.b	#%01111110	;--
-    808  f74a		       7e		      .byte.b	#%01111110	;--
-    809  f74b		       7e		      .byte.b	#%01111110	;--
-    810  f74c		       7e		      .byte.b	#%01111110	;--
-    811  f74d		       7e		      .byte.b	#%01111110	;--
-    812  f74e		       7e		      .byte.b	#%01111110	;--
-    813  f74f		       7e		      .byte.b	#%01111110	;--
-    814  f750		       7e		      .byte.b	#%01111110	;--
-    815  f751		       7e		      .byte.b	#%01111110	;--
-    816  f752		       7e		      .byte.b	#%01111110	;--
-    817  f753		       7e		      .byte.b	#%01111110	;--
-    818  f754		       3c		      .byte.b	#%00111100	;--
-    819  f755		       3c		      .byte.b	#%00111100	;--
-    820  f756		       18		      .byte.b	#%00011000	;--
-    821  f757
-    822  f757
-    823  f757							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    824  f757							; SetHorizPos routine
-    825  f757							; A = X coordinate
-    826  f757							; X = player number (0 or 1)
-    827  f757							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    828  f757
-    829  f757							; After this subroutine it is necessary to use
-    830  f757							;
-    831  f757							;	sta WSYNC
-    832  f757							;	sta HMOVE
-    833  f757							;
-    834  f757							; to correctly set the parameters
-    835  f757							; Then better to set (after waitin 26 cpu cycles)
-    836  f757							;
-    837  f757							;	sta HMCLR
-    838  f757							;
-    839  f757							; so next sta HMOVE will not impact the position
-    840  f757
-    841  f757							; Everything should be in the same page
-    842  f757							; otherwise the timing is not correct
-    843  f757
-    844  f757							; The entire routine is positioned in memory at the end just to
-    845  f757							; assure that the branch is not moving to a different page
-    846  f757							; Total size of the routine 18 bytes.
-    847  f757
-    848  f757				   SetHorizPos SUBROUTINE
-    849  f757		       38		      sec		; set carry flag
-    850  f758		       85 02		      sta	WSYNC	; start a new line
-    851  f75a				   .DivideLoop
-    852  f75a		       e9 0f		      sbc	#15	; subtract 15
-    853  f75c		       b0 fc		      bcs	.DivideLoop	; branch until negative
-    854  f75e		       49 07		      eor	#7	; calculate fine offset
-    855  f760		       0a		      asl
-    856  f761		       0a		      asl
-    857  f762		       0a		      asl
-    858  f763		       0a		      asl
-    859  f764		       95 20		      sta	HMP0,x	; set fine offset
-    860  f766		       95 10		      sta	RESP0,x	; fix coarse position
-    861  f768		       60		      rts		; return to caller
-    862  f769
-    863  f769							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    864  f769							; Epilogue
-    865  f769							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    866  f769
-    867  f7fc					      org	$f7fc
-    868  f7fc		       00 f0		      .word.w	Start	; reset vectora
-    869  f7fe		       00 f0		      .word.w	Start	; BRK vectordaw
+     17  f12a					      REPEND
+     18  f12b		       ea		      nop
+     17  f12b					      REPEND
+     18  f12c		       ea		      nop
+     17  f12c					      REPEND
+     18  f12d		       ea		      nop
+     17  f12d					      REPEND
+     18  f12e		       ea		      nop
+     17  f12e					      REPEND
+     18  f12f		       ea		      nop
+     19  f130					      REPEND
+    254  f130		       b5 91		      lda	FontBuf+5,x
+    255  f132		       85 0e		      sta	PF1	; set right score bitmap
+    256  f134		       c8		      iny
+    257  f135		       c0 0a		      cpy	#10
+    258  f137		       90 e2		      bcc	ScanLoop1a
+    259  f139
+    260  f139
+      0  f139					      TIMER_SETUP	9
+      1  f139				   .lines     SET	9
+      2  f139				   .cycles    SET	((.lines * 76) - 13)
+      3  f139
+      4  f139
+      5  f139				  -	      if	(.cycles % 64) < 12
+      6  f139				  -	      lda	#(.cycles / 64) - 1
+      7  f139				  -	      sta	WSYNC
+      8  f139					      else
+      9  f139		       a9 0a		      lda	#(.cycles / 64)
+     10  f13b		       85 02		      sta	WSYNC
+     11  f13d					      endif
+     12  f13d		       8d 96 02 	      sta	TIM64T
+    262  f140
+    263  f140		       a9 00		      lda	#0	; Y will contain the frame Y coordinate
+    264  f142		       85 0d		      sta	PF0
+    265  f144		       85 0e		      sta	PF1
+    266  f146		       85 0f		      sta	PF2
+    267  f148
+    268  f148		       85 02		      sta	WSYNC
+    269  f14a		       85 02		      sta	WSYNC
+    270  f14c
+    271  f14c		       a9 11		      lda	#%00010001
+    272  f14e		       85 0a		      sta	CTRLPF
+    273  f150		       a9 c2		      lda	#$C2
+    274  f152		       85 08		      sta	COLUPF
+    275  f154		       a9 ff		      lda	#%11111111
+    276  f156		       85 0d		      sta	PF0
+    277  f158		       85 0e		      sta	PF1
+    278  f15a		       85 0f		      sta	PF2
+    279  f15c
+    280  f15c		       a5 9a		      lda	PlayerWin
+    281  f15e		       d0 39		      bne	Finished
+    282  f160
+    283  f160							; Set sprite size and colors based on game mode
+    284  f160		       a5 81		      lda	GameMode
+    285  f162		       c9 02		      cmp	#2
+    286  f164		       d0 17		      bne	NormalSizeInGame
+    287  f166							; Mode 2: Big paddles (altura aumentada e sprite diferente)
+    288  f166		       a9 32		      lda	#SpriteHeightBig
+    289  f168		       85 83		      sta	CurrentSpriteHeight
+    290  f16a		       a9 56		      lda	#<PlayerSpriteBig
+    291  f16c		       85 84		      sta	CurrentSpritePtr
+    292  f16e		       a9 f7		      lda	#>PlayerSpriteBig
+    293  f170		       85 85		      sta	CurrentSpritePtr+1
+    294  f172		       a9 10		      lda	#%00010000	; normal width with 2 pixel ball
+    295  f174		       85 04		      sta	NUSIZ0
+    296  f176		       a9 00		      lda	#%00000000
+    297  f178		       85 05		      sta	NUSIZ1
+    298  f17a		       4c 91 f1 	      jmp	SizeDoneInGame
+    299  f17d				   NormalSizeInGame
+    300  f17d		       a9 21		      lda	#SpriteHeight
+    301  f17f		       85 83		      sta	CurrentSpriteHeight
+    302  f181		       a9 35		      lda	#<PlayerSprite
+    303  f183		       85 84		      sta	CurrentSpritePtr
+    304  f185		       a9 f7		      lda	#>PlayerSprite
+    305  f187		       85 85		      sta	CurrentSpritePtr+1
+    306  f189		       a9 10		      lda	#%00010000	; normal size with 2 pixel ball
+    307  f18b		       85 04		      sta	NUSIZ0
+    308  f18d		       a9 00		      lda	#%00000000
+    309  f18f		       85 05		      sta	NUSIZ1
+    310  f191				   SizeDoneInGame
+    311  f191
+    312  f191		       a9 48		      lda	#ColorP0
+    313  f193		       85 06		      sta	COLUP0	; set color for left
+    314  f195		       a9 a8		      lda	#ColorP1
+    315  f197		       85 07		      sta	COLUP1	; set color for right
+    316  f199
+    317  f199				   Finished
+    318  f199
+      0  f199					      TIMER_WAIT
+      1  f199				   .waittimer
+      2  f199		       ad 84 02 	      lda	INTIM
+      3  f19c		       d0 fb		      bne	.waittimer
+      4  f19e		       85 02		      sta	WSYNC
+    320  f1a0
+    321  f1a0
+    322  f1a0							; Section game field
+    323  f1a0		       a2 9c		      ldx	#160-4
+    324  f1a2
+    325  f1a2		       a9 0e		      lda	#$0E
+    326  f1a4		       85 08		      sta	COLUPF
+    327  f1a6
+    328  f1a6		       a9 00		      lda	#0
+    329  f1a8		       85 0e		      sta	PF1
+    330  f1aa		       a9 10		      lda	#%00010000
+    331  f1ac		       85 0d		      sta	PF0
+    332  f1ae		       a9 80		      lda	#%10000000
+    333  f1b0		       85 0f		      sta	PF2
+    334  f1b2		       85 02		      sta	WSYNC
+    335  f1b4				   Loop
+    336  f1b4
+    337  f1b4							; Draw ball
+    338  f1b4		       85 02		      STA	WSYNC
+    339  f1b6
+    340  f1b6		       8a		      txa		; X -> A
+    341  f1b7		       a0 00		      ldy	#%00000000
+    342  f1b9		       38		      sec		; set carry for subtract
+    343  f1ba		       e5 9c		      sbc	BallPosY	; local coordinate
+    344  f1bc		       c9 04		      cmp	#4	; in sprite?
+    345  f1be		       b0 02		      bcs	SetBall	; yes, skip over next
+    346  f1c0		       a4 9f		      ldy	BallEnable	; lookup frame data
+    347  f1c2				   SetBall
+    348  f1c2		       84 1f		      sty	ENABL	; store bitmap
+    349  f1c4
+    350  f1c4							; Draw Sprites
+    351  f1c4
+    352  f1c4							; Sprite 1
+    353  f1c4		       8a		      txa		; X -> A
+    354  f1c5		       38		      sec		; set carry for subtract
+    355  f1c6		       e5 89		      sbc	PosPlayer1	; local coordinate
+    356  f1c8		       c5 83		      cmp	CurrentSpriteHeight	; in sprite? (usa altura dinâmica)
+    357  f1ca		       90 02		      bcc	InSprite1	; yes, skip over next
+    358  f1cc		       a9 00		      lda	#0	; not in sprite, load 0
+    359  f1ce				   InSprite1
+    360  f1ce		       a8		      tay		; local coord -> Y
+    361  f1cf		       b1 84		      lda	(CurrentSpritePtr),y	; lookup frame data usando ponteiro
+    362  f1d1		       85 1c		      sta	GRP1	; store bitmap
+    363  f1d3
+    364  f1d3							; Sprite 0
+    365  f1d3		       8a		      txa		; X -> A
+    366  f1d4		       38		      sec		; set carry for subtract
+    367  f1d5		       e5 88		      sbc	PosPlayer0	; local coordinate
+    368  f1d7		       c5 83		      cmp	CurrentSpriteHeight	; in sprite? (usa altura dinâmica)
+    369  f1d9		       90 02		      bcc	InSprite0	; yes, skip over next
+    370  f1db		       a9 00		      lda	#0	; not in sprite, load 0
+    371  f1dd				   InSprite0
+    372  f1dd		       a8		      tay		; local coord -> Y
+    373  f1de		       b1 84		      lda	(CurrentSpritePtr),y	; lookup frame data usando ponteiro
+    374  f1e0		       85 1b		      sta	GRP0	; store bitmap
+    375  f1e2
+    376  f1e2		       ca		      dex
+    377  f1e3		       d0 cf		      bne	Loop
+    378  f1e5
+    379  f1e5
+    380  f1e5							; Lower part of the playfield
+    381  f1e5		       a9 c2		      lda	#$C2
+    382  f1e7		       85 08		      sta	COLUPF
+    383  f1e9
+    384  f1e9		       a9 ff		      lda	#%11111111
+    385  f1eb		       85 0e		      sta	PF1
+    386  f1ed		       85 0d		      sta	PF0
+    387  f1ef		       85 0f		      sta	PF2
+    388  f1f1
+    389  f1f1					      REPEAT	5
+    390  f1f1		       85 02		      sta	WSYNC
+    389  f1f1					      REPEND
+    390  f1f3		       85 02		      sta	WSYNC
+    389  f1f3					      REPEND
+    390  f1f5		       85 02		      sta	WSYNC
+    389  f1f5					      REPEND
+    390  f1f7		       85 02		      sta	WSYNC
+    389  f1f7					      REPEND
+    390  f1f9		       85 02		      sta	WSYNC
+    391  f1fb					      REPEND
+    392  f1fb
+    393  f1fb		       a9 ef		      lda	#%11101111
+    394  f1fd		       85 0d		      sta	PF0
+    395  f1ff		       85 02		      sta	WSYNC
+    396  f201		       a9 cf		      lda	#%11001111
+    397  f203		       85 0d		      sta	PF0
+    398  f205		       85 02		      sta	WSYNC
+    399  f207
+    400  f207
+    401  f207							; Clear playfield
+    402  f207		       a9 00		      lda	#0
+    403  f209		       85 0d		      sta	PF0
+    404  f20b		       85 0e		      sta	PF1
+    405  f20d		       85 0f		      sta	PF2
+    406  f20f
+    407  f20f		       85 02		      sta	WSYNC
+    408  f211		       85 02		      sta	WSYNC
+    409  f213
+    410  f213
+    411  f213							; 29 lines of overscan
+      0  f213					      TIMER_SETUP	29
+      1  f213				   .lines     SET	29
+      2  f213				   .cycles    SET	((.lines * 76) - 13)
+      3  f213
+      4  f213
+      5  f213				  -	      if	(.cycles % 64) < 12
+      6  f213				  -	      lda	#(.cycles / 64) - 1
+      7  f213				  -	      sta	WSYNC
+      8  f213					      else
+      9  f213		       a9 22		      lda	#(.cycles / 64)
+     10  f215		       85 02		      sta	WSYNC
+     11  f217					      endif
+     12  f217		       8d 96 02 	      sta	TIM64T
+    413  f21a
+    414  f21a
+    415  f21a							; Checking collisions between ball and left/right limit
+    416  f21a							; Also updating ball positiona and score if necessary
+    417  f21a
+    418  f21a		       f8		      sed
+    419  f21b		       a5 9b		      lda	BallPosX
+    420  f21d		       c9 9b		      cmp	#$9B	; Check if >= 155 (was hitting exactly 157)
+    421  f21f		       90 28		      bcc	NoHitRightWall
+    422  f221		       a9 00		      lda	#0
+    423  f223		       85 99		      sta	ScoredPlayer0
+    424  f225		       a5 8a		      lda	Score0
+    425  f227		       c9 20		      cmp	#ScoreToWin
+    426  f229		       d0 09		      bne	NotWonYet0
+    427  f22b		       a9 01		      lda	#1
+    428  f22d		       85 9a		      sta	PlayerWin
+    429  f22f		       a9 a0		      lda	#160
+    430  f231		       4c 36 f2 	      jmp	SetWin0
+    431  f234				   NotWonYet0
+    432  f234		       a9 14		      lda	#20
+    433  f236				   SetWin0
+    434  f236		       85 98		      sta	CountScoreFrame
+    435  f238		       a9 64		      lda	#100
+    436  f23a		       85 9b		      sta	BallPosX
+    437  f23c		       a5 9d		      lda	BallDirection
+    438  f23e		       49 40		      eor	#%01000000
+    439  f240		       85 9d		      sta	BallDirection
+    440  f242		       18		      clc
+    441  f243		       a5 8a		      lda	Score0
+    442  f245		       69 01		      adc	#1
+    443  f247		       85 8a		      sta	Score0
+    444  f249				   NoHitRightWall
+    445  f249
+    446  f249		       a5 9b		      lda	BallPosX
+    447  f24b		       c9 0a		      cmp	#10	; Check if <= 10 (was hitting exactly 8)
+    448  f24d		       b0 28		      bcs	NoHitLeftWall
+    449  f24f		       a9 01		      lda	#1
+    450  f251		       85 99		      sta	ScoredPlayer0
+    451  f253		       a5 8b		      lda	Score1
+    452  f255		       c9 20		      cmp	#ScoreToWin
+    453  f257		       d0 09		      bne	NotWonYet1
+    454  f259		       a9 01		      lda	#1
+    455  f25b		       85 9a		      sta	PlayerWin
+    456  f25d		       a9 a0		      lda	#160
+    457  f25f		       4c 64 f2 	      jmp	SetWin1
+    458  f262				   NotWonYet1
+    459  f262		       a9 14		      lda	#20
+    460  f264				   SetWin1
+    461  f264		       85 98		      sta	CountScoreFrame
+    462  f266		       a9 32		      lda	#50
+    463  f268		       85 9b		      sta	BallPosX
+    464  f26a		       a5 9d		      lda	BallDirection
+    465  f26c		       49 40		      eor	#%01000000
+    466  f26e		       85 9d		      sta	BallDirection
+    467  f270		       18		      clc
+    468  f271		       a5 8b		      lda	Score1
+    469  f273		       69 01		      adc	#1
+    470  f275		       85 8b		      sta	Score1
+    471  f277				   NoHitLeftWall
+    472  f277		       d8		      cld
+    473  f278
+    474  f278							; Handles players movement
+    475  f278
+    476  f278		       a5 98		      lda	CountScoreFrame
+    477  f27a		       d0 7d		      bne	NoCheckMovement
+    478  f27c
+    479  f27c							; Checks ball movements
+    480  f27c		       24 9d		      bit	BallDirection
+    481  f27e		       50 0d		      bvc	DecX
+    482  f280
+    483  f280		       e6 9b		      inc	BallPosX
+    484  f282							; Check game mode for fast ball (mode 1)
+    485  f282		       a5 81		      lda	GameMode
+    486  f284		       c9 01		      cmp	#1
+    487  f286		       d0 0f		      bne	XDirection
+    488  f288		       e6 9b		      inc	BallPosX	; move ball twice as fast in mode 1
+    489  f28a		       4c 97 f2 	      jmp	XDirection
+    490  f28d				   DecX
+    491  f28d		       c6 9b		      dec	BallPosX
+    492  f28f							; Check game mode for fast ball (mode 1)
+    493  f28f		       a5 81		      lda	GameMode
+    494  f291		       c9 01		      cmp	#1
+    495  f293		       d0 02		      bne	XDirection
+    496  f295		       c6 9b		      dec	BallPosX	; move ball twice as fast in mode 1
+    497  f297				   XDirection
+    498  f297
+    499  f297
+    500  f297		       24 9d		      bit	BallDirection
+    501  f299		       10 05		      bpl	DecY
+    502  f29b		       e6 9c		      inc	BallPosY
+    503  f29d		       4c a2 f2 	      jmp	YDirection
+    504  f2a0				   DecY
+    505  f2a0		       c6 9c		      dec	BallPosY
+    506  f2a2				   YDirection
+    507  f2a2
+    508  f2a2		       a9 02		      lda	#%00000010
+    509  f2a4		       85 9f		      sta	BallEnable
+    510  f2a6
+    511  f2a6							; Player 0 movement (vertical and horizontal)
+    512  f2a6		       ad 80 02 	      lda	SWCHA
+    513  f2a9		       29 10		      and	#%00010000	; Down
+    514  f2ab		       d0 04		      bne	NoMovP0Down
+    515  f2ad		       e6 88		      inc	PosPlayer0
+    516  f2af		       e6 88		      inc	PosPlayer0
+    517  f2b1				   NoMovP0Down
+    518  f2b1		       ad 80 02 	      lda	SWCHA
+    519  f2b4		       29 20		      and	#%00100000	; Up
+    520  f2b6		       d0 04		      bne	NoMovP0Up
+    521  f2b8		       c6 88		      dec	PosPlayer0
+    522  f2ba		       c6 88		      dec	PosPlayer0
+    523  f2bc				   NoMovP0Up
+    524  f2bc		       ad 80 02 	      lda	SWCHA
+    525  f2bf		       29 40		      and	#%01000000	; Left
+    526  f2c1		       d0 02		      bne	NoMovP0Left
+    527  f2c3		       c6 86		      dec	HorizPosPlayer0
+    528  f2c5				   NoMovP0Left
+    529  f2c5		       ad 80 02 	      lda	SWCHA
+    530  f2c8		       29 80		      and	#%10000000	; Right
+    531  f2ca		       d0 02		      bne	NoMovP0Right
+    532  f2cc		       e6 86		      inc	HorizPosPlayer0
+    533  f2ce				   NoMovP0Right
+    534  f2ce
+    535  f2ce							; Player 1 movement (vertical and horizontal)
+    536  f2ce		       ad 80 02 	      lda	SWCHA
+    537  f2d1		       29 01		      and	#%00000001	; Down
+    538  f2d3		       d0 04		      bne	NoMovP1Down
+    539  f2d5		       e6 89		      inc	PosPlayer1
+    540  f2d7		       e6 89		      inc	PosPlayer1
+    541  f2d9				   NoMovP1Down
+    542  f2d9		       ad 80 02 	      lda	SWCHA
+    543  f2dc		       29 02		      and	#%00000010	; Up
+    544  f2de		       d0 04		      bne	NoMovP1Up
+    545  f2e0		       c6 89		      dec	PosPlayer1
+    546  f2e2		       c6 89		      dec	PosPlayer1
+    547  f2e4				   NoMovP1Up
+    548  f2e4		       ad 80 02 	      lda	SWCHA
+    549  f2e7		       29 04		      and	#%00000100	; Left
+    550  f2e9		       d0 02		      bne	NoMovP1Left
+    551  f2eb		       c6 87		      dec	HorizPosPlayer1
+    552  f2ed				   NoMovP1Left
+    553  f2ed		       ad 80 02 	      lda	SWCHA
+    554  f2f0		       29 08		      and	#%00001000	; Right
+    555  f2f2		       d0 02		      bne	NoMovP1Right
+    556  f2f4		       e6 87		      inc	HorizPosPlayer1
+    557  f2f6				   NoMovP1Right
+    558  f2f6		       4c fd f2 	      jmp	CheckMovement
+    559  f2f9
+    560  f2f9				   NoCheckMovement
+    561  f2f9		       a9 00		      lda	#%00000000
+    562  f2fb		       85 9f		      sta	BallEnable
+    563  f2fd				   CheckMovement
+    564  f2fd
+    565  f2fd							; Verifies that players do not move outside the vertical limits
+    566  f2fd		       a5 89		      lda	PosPlayer1
+    567  f2ff		       c9 02		      cmp	#2
+    568  f301		       10 04		      bpl	P1VertOK1
+    569  f303		       a9 02		      lda	#2
+    570  f305		       85 89		      sta	PosPlayer1
+    571  f307				   P1VertOK1
+    572  f307		       a5 88		      lda	PosPlayer0
+    573  f309		       c9 02		      cmp	#2
+    574  f30b		       10 04		      bpl	P0VertOK1
+    575  f30d		       a9 02		      lda	#2
+    576  f30f		       85 88		      sta	PosPlayer0
+    577  f311				   P0VertOK1
+    578  f311
+    579  f311		       a5 89		      lda	PosPlayer1
+    580  f313		       c9 7c		      cmp	#$7C
+    581  f315		       30 04		      bmi	P1VertOK2
+    582  f317		       a9 7b		      lda	#$7B
+    583  f319		       85 89		      sta	PosPlayer1
+    584  f31b				   P1VertOK2
+    585  f31b		       a5 88		      lda	PosPlayer0
+    586  f31d		       c9 7c		      cmp	#$7C
+    587  f31f		       30 04		      bmi	P0VertOK2
+    588  f321		       a9 7b		      lda	#$7b
+    589  f323		       85 88		      sta	PosPlayer0
+    590  f325				   P0VertOK2
+    591  f325
+    592  f325							; Verifies that players do not move outside the horizontal limits
+    593  f325							; Player 0 (left side): minimum 10, maximum 75 (middle of screen)
+    594  f325		       a5 86		      lda	HorizPosPlayer0
+    595  f327		       c9 0a		      cmp	#10
+    596  f329		       10 04		      bpl	P0HorizOK1
+    597  f32b		       a9 0a		      lda	#10
+    598  f32d		       85 86		      sta	HorizPosPlayer0
+    599  f32f				   P0HorizOK1
+    600  f32f		       a5 86		      lda	HorizPosPlayer0
+    601  f331		       c9 4b		      cmp	#75
+    602  f333		       30 04		      bmi	P0HorizOK2
+    603  f335		       a9 4b		      lda	#75
+    604  f337		       85 86		      sta	HorizPosPlayer0
+    605  f339				   P0HorizOK2
+    606  f339
+    607  f339							; Player 1 (right side): minimum 85 (middle of screen), maximum 148
+    608  f339		       a5 87		      lda	HorizPosPlayer1
+    609  f33b		       c9 55		      cmp	#85
+    610  f33d		       10 04		      bpl	P1HorizOK1
+    611  f33f		       a9 55		      lda	#85
+    612  f341		       85 87		      sta	HorizPosPlayer1
+    613  f343				   P1HorizOK1
+    614  f343		       a5 87		      lda	HorizPosPlayer1
+    615  f345		       c9 94		      cmp	#148
+    616  f347		       30 04		      bmi	P1HorizOK2
+    617  f349		       a9 94		      lda	#148
+    618  f34b		       85 87		      sta	HorizPosPlayer1
+    619  f34d				   P1HorizOK2
+    620  f34d
+    621  f34d							; Checking collisions between ball and players
+    622  f34d
+    623  f34d		       a5 9e		      lda	BallDirCounter
+    624  f34f		       d0 27		      bne	DoNotCheckPlayerHitBall
+    625  f351
+    626  f351		       24 02		      bit	CXP0FB
+    627  f353		       50 0e		      bvc	NoHitPlayer0
+    628  f355		       a9 0a		      lda	#10
+    629  f357		       85 9e		      sta	BallDirCounter
+    630  f359		       a5 9d		      lda	BallDirection
+    631  f35b		       49 40		      eor	#%01000000
+    632  f35d		       85 9d		      sta	BallDirection
+    633  f35f		       a9 0a		      lda	#10
+    634  f361		       85 19		      sta	AUDV0
+    635  f363				   NoHitPlayer0
+    636  f363
+    637  f363		       24 03		      bit	CXP1FB
+    638  f365		       50 0e		      bvc	NoHitPlayer1
+    639  f367		       a9 0a		      lda	#10
+    640  f369		       85 9e		      sta	BallDirCounter
+    641  f36b		       a5 9d		      lda	BallDirection
+    642  f36d		       49 40		      eor	#%01000000
+    643  f36f		       85 9d		      sta	BallDirection
+    644  f371		       a9 06		      lda	#6
+    645  f373		       85 19		      sta	AUDV0
+    646  f375				   NoHitPlayer1
+    647  f375		       4c 7a f3 	      jmp	NoBallCounterDec
+    648  f378
+    649  f378				   DoNotCheckPlayerHitBall
+    650  f378		       c6 9e		      dec	BallDirCounter
+    651  f37a				   NoBallCounterDec
+    652  f37a
+    653  f37a							; Reset collition status
+    654  f37a		       85 2c		      sta	CXCLR
+    655  f37c
+    656  f37c
+    657  f37c							; Checking collisions between ball and top/bottom wall
+    658  f37c
+    659  f37c		       a5 9c		      lda	BallPosY
+    660  f37e		       c9 9a		      cmp	#154
+    661  f380		       d0 0a		      bne	NoHitTopWall
+    662  f382		       a5 9d		      lda	BallDirection
+    663  f384		       49 80		      eor	#%10000000
+    664  f386		       85 9d		      sta	BallDirection
+    665  f388		       a9 06		      lda	#6
+    666  f38a		       85 19		      sta	AUDV0
+    667  f38c				   NoHitTopWall
+    668  f38c
+    669  f38c		       a5 9c		      lda	BallPosY
+    670  f38e		       c9 02		      cmp	#2
+    671  f390		       d0 0a		      bne	NoHitBottomWall
+    672  f392		       a5 9d		      lda	BallDirection
+    673  f394		       49 80		      eor	#%10000000
+    674  f396		       85 9d		      sta	BallDirection
+    675  f398		       a9 06		      lda	#6
+    676  f39a		       85 19		      sta	AUDV0
+    677  f39c				   NoHitBottomWall
+    678  f39c
+    679  f39c		       a5 98		      lda	CountScoreFrame
+    680  f39e		       f0 10		      beq	NoActionScore
+    681  f3a0		       c6 98		      dec	CountScoreFrame
+    682  f3a2		       d0 07		      bne	NoCheckWin
+    683  f3a4		       a5 9a		      lda	PlayerWin
+    684  f3a6		       f0 03		      beq	NoCheckWin
+    685  f3a8		       4c 00 f0 	      jmp	Start
+    686  f3ab				   NoCheckWin
+    687  f3ab		       a4 99		      ldy	ScoredPlayer0
+    688  f3ad		       4c bb f3 	      jmp	SetScoreColor
+    689  f3b0
+    690  f3b0				   NoActionScore
+    691  f3b0		       a9 48		      lda	#$48
+    692  f3b2		       85 96		      sta	ColorScoreP0
+    693  f3b4		       a9 a8		      lda	#$a8
+    694  f3b6		       85 97		      sta	ColorScoreP1
+    695  f3b8		       4c be f3 	      jmp	ScoreCheckCompleted
+    696  f3bb				   SetScoreColor
+    697  f3bb		       99 96 00 	      sta	ColorScoreP0,y
+    698  f3be				   ScoreCheckCompleted
+    699  f3be
+      0  f3be					      TIMER_WAIT
+      1  f3be				   .waittimer
+      2  f3be		       ad 84 02 	      lda	INTIM
+      3  f3c1		       d0 fb		      bne	.waittimer
+      4  f3c3		       85 02		      sta	WSYNC
+    701  f3c5
+    702  f3c5							; total = 262 lines, go to next frame
+    703  f3c5		       4c 69 f0 	      jmp	NextFrame
+    704  f3c8
+    705  f3c8
+    706  f3c8							; Fetches bitmap data for two digits of a
+    707  f3c8							; BCD-encoded number, storing it in addresses
+    708  f3c8							; FontBuf+x to FontBuf+4+x.
+    709  f3c8				   GetBCDBitmap subroutine
+    710  f3c8							; First fetch the bytes for the 1st digit
+    711  f3c8		       48		      pha		; save original BCD number
+    712  f3c9		       29 0f		      and	#$0F	; mask out the least significant digit
+    713  f3cb		       85 80		      sta	Temp
+    714  f3cd		       0a		      asl
+    715  f3ce		       0a		      asl
+    716  f3cf		       65 80		      adc	Temp	; multiply by 5
+    717  f3d1		       a8		      tay		; -> Y
+    718  f3d2		       a9 05		      lda	#5
+    719  f3d4		       85 80		      sta	Temp	; count down from 5
+    720  f3d6				   .loop1
+    721  f3d6		       b9 03 f7 	      lda	DigitsBitmap,y
+    722  f3d9		       29 0f		      and	#$0F	; mask out leftmost digit
+    723  f3db		       95 8c		      sta	FontBuf,x	; store leftmost digit
+    724  f3dd		       c8		      iny
+    725  f3de		       e8		      inx
+    726  f3df		       c6 80		      dec	Temp
+    727  f3e1		       d0 f3		      bne	.loop1
+    728  f3e3							; Now do the 2nd digit
+    729  f3e3		       68		      pla		; restore original BCD number
+    730  f3e4		       4a		      lsr
+    731  f3e5		       4a		      lsr
+    732  f3e6		       4a		      lsr
+    733  f3e7		       4a		      lsr		; shift right by 4 (in BCD, divide by 10)
+    734  f3e8		       85 80		      sta	Temp
+    735  f3ea		       0a		      asl
+    736  f3eb		       0a		      asl
+    737  f3ec		       65 80		      adc	Temp	; multiply by 5
+    738  f3ee		       a8		      tay		; -> Y
+    739  f3ef		       ca		      dex
+    740  f3f0		       ca		      dex
+    741  f3f1		       ca		      dex
+    742  f3f2		       ca		      dex
+    743  f3f3		       ca		      dex		; subtract 5 from X (reset to original)
+    744  f3f4		       a9 05		      lda	#5
+    745  f3f6		       85 80		      sta	Temp	; count down from 5
+    746  f3f8				   .loop2
+    747  f3f8		       b9 03 f7 	      lda	DigitsBitmap,y
+    748  f3fb		       29 f0		      and	#$F0	; mask out leftmost digit
+    749  f3fd		       15 8c		      ora	FontBuf,x	; combine left and right digits
+    750  f3ff		       95 8c		      sta	FontBuf,x	; store combined digits
+    751  f401		       c8		      iny
+    752  f402		       e8		      inx
+    753  f403		       c6 80		      dec	Temp
+    754  f405		       d0 f1		      bne	.loop2
+    755  f407		       60		      rts
+    756  f408
+    757  f700					      org	$F700
+    758  f700
+    759  f700							; Game mode colors for visual feedback
+    760  f700				   GameModeColors
+    761  f700		       c2		      .byte.b	$C2	; Mode 0: Normal - cyan
+    762  f701		       46		      .byte.b	$46	; Mode 1: Fast ball - red
+    763  f702		       d6		      .byte.b	$D6	; Mode 2: Big paddles - purple
+    764  f703
+    765  f703							; Bitmap pattern for digits
+    766  f703				   DigitsBitmap 		;;{w:8,h:5,count:10,brev:1};;
+    767  f703		       ee aa aa aa*	      .byte.b	$EE,$AA,$AA,$AA,$EE
+    768  f708		       22 22 22 22*	      .byte.b	$22,$22,$22,$22,$22
+    769  f70d		       ee 22 ee 88*	      .byte.b	$EE,$22,$EE,$88,$EE
+    770  f712		       ee 22 66 22*	      .byte.b	$EE,$22,$66,$22,$EE
+    771  f717		       aa aa ee 22*	      .byte.b	$AA,$AA,$EE,$22,$22
+    772  f71c		       ee 88 ee 22*	      .byte.b	$EE,$88,$EE,$22,$EE
+    773  f721		       ee 88 ee aa*	      .byte.b	$EE,$88,$EE,$AA,$EE
+    774  f726		       ee 22 22 22*	      .byte.b	$EE,$22,$22,$22,$22
+    775  f72b		       ee aa ee aa*	      .byte.b	$EE,$AA,$EE,$AA,$EE
+    776  f730		       ee aa ee 22*	      .byte.b	$EE,$AA,$EE,$22,$EE
+    777  f735
+    778  f735							;---Graphics Data from PlayerPal 2600---
+    779  f735
+    780  f735							; Player graphics data - MODO NORMAL (33 linhas)
+    781  f735				   PlayerSprite
+    782  f735		       00		      .byte.b	#%00000000	;-- linha 0
+    783  f736		       18		      .byte.b	#%00011000	;-- linha 1
+    784  f737		       3c		      .byte.b	#%00111100	;-- linha 2
+    785  f738		       3c		      .byte.b	#%00111100	;-- linha 3
+    786  f739		       7e		      .byte.b	#%01111110	;-- linha 4
+    787  f73a		       7e		      .byte.b	#%01111110	;-- linha 5
+    788  f73b		       7e		      .byte.b	#%01111110	;-- linha 6
+    789  f73c		       7e		      .byte.b	#%01111110	;-- linha 7
+    790  f73d		       7e		      .byte.b	#%01111110	;-- linha 8
+    791  f73e		       7e		      .byte.b	#%01111110	;-- linha 9
+    792  f73f		       7e		      .byte.b	#%01111110	;-- linha 10
+    793  f740		       7e		      .byte.b	#%01111110	;-- linha 11
+    794  f741		       7e		      .byte.b	#%01111110	;-- linha 12
+    795  f742		       7e		      .byte.b	#%01111110	;-- linha 13
+    796  f743		       7e		      .byte.b	#%01111110	;-- linha 14
+    797  f744		       7e		      .byte.b	#%01111110	;-- linha 15
+    798  f745		       7e		      .byte.b	#%01111110	;-- linha 16
+    799  f746		       7e		      .byte.b	#%01111110	;-- linha 17
+    800  f747		       7e		      .byte.b	#%01111110	;-- linha 18
+    801  f748		       7e		      .byte.b	#%01111110	;-- linha 19
+    802  f749		       7e		      .byte.b	#%01111110	;-- linha 20
+    803  f74a		       7e		      .byte.b	#%01111110	;-- linha 21
+    804  f74b		       7e		      .byte.b	#%01111110	;-- linha 22
+    805  f74c		       7e		      .byte.b	#%01111110	;-- linha 23
+    806  f74d		       7e		      .byte.b	#%01111110	;-- linha 24
+    807  f74e		       7e		      .byte.b	#%01111110	;-- linha 25
+    808  f74f		       7e		      .byte.b	#%01111110	;-- linha 26
+    809  f750		       7e		      .byte.b	#%01111110	;-- linha 27
+    810  f751		       7e		      .byte.b	#%01111110	;-- linha 28
+    811  f752		       7e		      .byte.b	#%01111110	;-- linha 29
+    812  f753		       3c		      .byte.b	#%00111100	;-- linha 30
+    813  f754		       3c		      .byte.b	#%00111100	;-- linha 31
+    814  f755		       18		      .byte.b	#%00011000	;-- linha 32
+    815  f756
+    816  f756							; Player graphics data - MODO BIG PADDLES (50 linhas - sem afunilamento)
+    817  f756				   PlayerSpriteBig
+    818  f756		       00		      .byte.b	#%00000000	;-- linha 0
+    819  f757		       18		      .byte.b	#%00011000	;-- linha 1
+    820  f758		       3c		      .byte.b	#%00111100	;-- linha 2
+    821  f759		       3c		      .byte.b	#%00111100	;-- linha 3
+    822  f75a		       7e		      .byte.b	#%01111110	;-- linha 4
+    823  f75b		       7e		      .byte.b	#%01111110	;-- linha 5
+    824  f75c		       7e		      .byte.b	#%01111110	;-- linha 6
+    825  f75d		       7e		      .byte.b	#%01111110	;-- linha 7
+    826  f75e		       7e		      .byte.b	#%01111110	;-- linha 8
+    827  f75f		       7e		      .byte.b	#%01111110	;-- linha 9
+    828  f760		       7e		      .byte.b	#%01111110	;-- linha 10
+    829  f761		       7e		      .byte.b	#%01111110	;-- linha 11
+    830  f762		       7e		      .byte.b	#%01111110	;-- linha 12
+    831  f763		       7e		      .byte.b	#%01111110	;-- linha 13
+    832  f764		       7e		      .byte.b	#%01111110	;-- linha 14
+    833  f765		       7e		      .byte.b	#%01111110	;-- linha 15
+    834  f766		       7e		      .byte.b	#%01111110	;-- linha 16
+    835  f767		       7e		      .byte.b	#%01111110	;-- linha 17
+    836  f768		       7e		      .byte.b	#%01111110	;-- linha 18
+    837  f769		       7e		      .byte.b	#%01111110	;-- linha 19
+    838  f76a		       7e		      .byte.b	#%01111110	;-- linha 20
+    839  f76b		       7e		      .byte.b	#%01111110	;-- linha 21
+    840  f76c		       7e		      .byte.b	#%01111110	;-- linha 22
+    841  f76d		       7e		      .byte.b	#%01111110	;-- linha 23
+    842  f76e		       7e		      .byte.b	#%01111110	;-- linha 24
+    843  f76f		       7e		      .byte.b	#%01111110	;-- linha 25
+    844  f770		       7e		      .byte.b	#%01111110	;-- linha 26
+    845  f771		       7e		      .byte.b	#%01111110	;-- linha 27
+    846  f772		       7e		      .byte.b	#%01111110	;-- linha 28
+    847  f773		       7e		      .byte.b	#%01111110	;-- linha 29
+    848  f774		       7e		      .byte.b	#%01111110	;-- linha 30 (continua largo)
+    849  f775		       7e		      .byte.b	#%01111110	;-- linha 31 (continua largo)
+    850  f776		       7e		      .byte.b	#%01111110	;-- linha 32 (continua largo)
+    851  f777		       7e		      .byte.b	#%01111110	;-- linha 33
+    852  f778		       7e		      .byte.b	#%01111110	;-- linha 34
+    853  f779		       7e		      .byte.b	#%01111110	;-- linha 35
+    854  f77a		       7e		      .byte.b	#%01111110	;-- linha 36
+    855  f77b		       7e		      .byte.b	#%01111110	;-- linha 37
+    856  f77c		       7e		      .byte.b	#%01111110	;-- linha 38
+    857  f77d		       7e		      .byte.b	#%01111110	;-- linha 39
+    858  f77e		       7e		      .byte.b	#%01111110	;-- linha 40
+    859  f77f		       7e		      .byte.b	#%01111110	;-- linha 41
+    860  f780		       7e		      .byte.b	#%01111110	;-- linha 42
+    861  f781		       7e		      .byte.b	#%01111110	;-- linha 43
+    862  f782		       7e		      .byte.b	#%01111110	;-- linha 44
+    863  f783		       7e		      .byte.b	#%01111110	;-- linha 45
+    864  f784		       7e		      .byte.b	#%01111110	;-- linha 46
+    865  f785		       7e		      .byte.b	#%01111110	;-- linha 47
+    866  f786		       3c		      .byte.b	#%00111100	;-- linha 48
+    867  f787		       18		      .byte.b	#%00011000	;-- linha 49
+    868  f788
+    869  f788
+    870  f788							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    871  f788							; SetHorizPos routine
+    872  f788							; A = X coordinate
+    873  f788							; X = player number (0 or 1)
+    874  f788							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    875  f788
+    876  f788							; After this subroutine it is necessary to use
+    877  f788							;
+    878  f788							;	sta WSYNC
+    879  f788							;	sta HMOVE
+    880  f788							;
+    881  f788							; to correctly set the parameters
+    882  f788							; Then better to set (after waitin 26 cpu cycles)
+    883  f788							;
+    884  f788							;	sta HMCLR
+    885  f788							;
+    886  f788							; so next sta HMOVE will not impact the position
+    887  f788
+    888  f788							; Everything should be in the same page
+    889  f788							; otherwise the timing is not correct
+    890  f788
+    891  f788							; The entire routine is positioned in memory at the end just to
+    892  f788							; assure that the branch is not moving to a different page
+    893  f788							; Total size of the routine 18 bytes.
+    894  f788
+    895  f788				   SetHorizPos SUBROUTINE
+    896  f788		       38		      sec		; set carry flag
+    897  f789		       85 02		      sta	WSYNC	; start a new line
+    898  f78b				   .DivideLoop
+    899  f78b		       e9 0f		      sbc	#15	; subtract 15
+    900  f78d		       b0 fc		      bcs	.DivideLoop	; branch until negative
+    901  f78f		       49 07		      eor	#7	; calculate fine offset
+    902  f791		       0a		      asl
+    903  f792		       0a		      asl
+    904  f793		       0a		      asl
+    905  f794		       0a		      asl
+    906  f795		       95 20		      sta	HMP0,x	; set fine offset
+    907  f797		       95 10		      sta	RESP0,x	; fix coarse position
+    908  f799		       60		      rts		; return to caller
+    909  f79a
+    910  f79a							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    911  f79a							; Epilogue
+    912  f79a							;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    913  f79a
+    914  f7fc					      org	$f7fc
+    915  f7fc		       00 f0		      .word.w	Start	; reset vectora
+    916  f7fe		       00 f0		      .word.w	Start	; BRK vectordaw

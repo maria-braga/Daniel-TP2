@@ -4,6 +4,7 @@
 	include "xmacro.h"
         
 SpriteHeight	equ 33
+SpriteHeightBig	equ 50  ; altura maior para big paddles
 ColorP0		equ $48
 ColorP1		equ $a8
 ScoreToWin	equ $20
@@ -19,6 +20,7 @@ Temp		.byte
 ; Game mode variable
 GameMode	.byte	; 0 = normal, 1 = fast ball, 2 = big paddles
 GameSelectDebounce .byte ; debounce for game select switch
+CurrentSpriteHeight .byte ; altura atual dos sprites
 
 ; Horizontal position players 2 bytes
 HorizPosPlayer0	.byte
@@ -76,6 +78,8 @@ Start
         sta PlayerWin
         sta GameMode
         sta GameSelectDebounce
+        lda #SpriteHeight
+        sta CurrentSpriteHeight
         lda #0
         sta CountScoreFrame
         
@@ -275,12 +279,17 @@ ScanLoop1a
         lda GameMode
         cmp #2
         bne NormalSizeInGame
-        ; Mode 2: Big paddles
-        lda #%00000101	; double width sprites
+        ; Mode 2: Big paddles (altura aumentada)
+        lda #SpriteHeightBig
+        sta CurrentSpriteHeight
+        lda #%00010000	; normal width with 2 pixel ball
         sta NUSIZ0
+        lda #%00000000
         sta NUSIZ1
         jmp SizeDoneInGame
 NormalSizeInGame
+        lda #SpriteHeight
+        sta CurrentSpriteHeight
         lda #%00010000	; normal size with 2 pixel ball
         sta NUSIZ0
         lda #%00000000
@@ -331,7 +340,7 @@ SetBall
 	txa		; X -> A
         sec		; set carry for subtract
         sbc PosPlayer1	; local coordinate
-        cmp #SpriteHeight ; in sprite?
+        cmp CurrentSpriteHeight ; in sprite? (usa altura dinâmica)
         bcc InSprite1	; yes, skip over next
         lda #0		; not in sprite, load 0
 InSprite1
@@ -343,7 +352,7 @@ InSprite1
 	txa		; X -> A
         sec		; set carry for subtract
         sbc PosPlayer0	; local coordinate
-        cmp #SpriteHeight ; in sprite?
+        cmp CurrentSpriteHeight ; in sprite? (usa altura dinâmica)
         bcc InSprite0	; yes, skip over next
         lda #0		; not in sprite, load 0
 InSprite0
@@ -755,41 +764,59 @@ DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
         
 ;---Graphics Data from PlayerPal 2600---
 
-; Player graphics data
+; Player graphics data (50 lines total - usado dinamicamente conforme o modo)
 PlayerSprite
-        .byte #%00000000;--
-        .byte #%00011000;--
-        .byte #%00111100;--
-        .byte #%00111100;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--   
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--      
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%01111110;--
-        .byte #%00111100;--
-        .byte #%00111100;--
-        .byte #%00011000;--
+        .byte #%00000000;-- linha 0
+        .byte #%00011000;-- linha 1
+        .byte #%00111100;-- linha 2
+        .byte #%00111100;-- linha 3
+        .byte #%01111110;-- linha 4
+        .byte #%01111110;-- linha 5
+        .byte #%01111110;-- linha 6
+        .byte #%01111110;-- linha 7
+        .byte #%01111110;-- linha 8
+        .byte #%01111110;-- linha 9
+        .byte #%01111110;-- linha 10
+        .byte #%01111110;-- linha 11
+        .byte #%01111110;-- linha 12
+        .byte #%01111110;-- linha 13
+        .byte #%01111110;-- linha 14
+        .byte #%01111110;-- linha 15
+        .byte #%01111110;-- linha 16
+        .byte #%01111110;-- linha 17
+        .byte #%01111110;-- linha 18
+        .byte #%01111110;-- linha 19
+        .byte #%01111110;-- linha 20
+        .byte #%01111110;-- linha 21
+        .byte #%01111110;-- linha 22
+        .byte #%01111110;-- linha 23
+        .byte #%01111110;-- linha 24
+        .byte #%01111110;-- linha 25
+        .byte #%01111110;-- linha 26
+        .byte #%01111110;-- linha 27
+        .byte #%01111110;-- linha 28
+        .byte #%01111110;-- linha 29
+        .byte #%00111100;-- linha 30
+        .byte #%00111100;-- linha 31
+        .byte #%00011000;-- linha 32 (fim do sprite normal de 33 linhas)
+        ; Extensão para big paddles (mais 17 linhas para chegar a 50)
+        .byte #%00111100;-- linha 33
+        .byte #%00111100;-- linha 34
+        .byte #%01111110;-- linha 35
+        .byte #%01111110;-- linha 36
+        .byte #%01111110;-- linha 37
+        .byte #%01111110;-- linha 38
+        .byte #%01111110;-- linha 39
+        .byte #%01111110;-- linha 40
+        .byte #%01111110;-- linha 41
+        .byte #%01111110;-- linha 42
+        .byte #%01111110;-- linha 43
+        .byte #%01111110;-- linha 44
+        .byte #%01111110;-- linha 45
+        .byte #%01111110;-- linha 46
+        .byte #%01111110;-- linha 47
+        .byte #%00111100;-- linha 48
+        .byte #%00011000;-- linha 49
         
         
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
