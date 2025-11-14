@@ -48,7 +48,6 @@ BallPosY	.byte
 BallDirection	.byte	; Byte 7 y dir - bit 6 for x dir 
 BallDirCounter	.byte
 BallEnable	.byte
-BallColor	.byte	; cor da bola
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,8 +91,6 @@ Start
         ldx #0			; Initialize with mode 0
         lda GameFieldLineColors,x	; Initialize game field color (green)
         sta GameFieldColor
-        lda #$0E		; Initialize ball color (white/bright)
-        sta BallColor
         
         lda #%00000010
         sta BallEnable
@@ -776,7 +773,7 @@ GameModeColors
 
 ; Game field line colors for each mode
 GameFieldLineColors
-        .byte $09	; Mode 0: Normal - green
+        .byte $7	; Mode 0: Normal - green
         .byte $28	; Mode 1: Fast ball - orange
         .byte $EA	; Mode 2: Small paddles - green
 
