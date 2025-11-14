@@ -22,6 +22,7 @@ GameMode	.byte	; 0 = normal, 1 = fast ball, 2 = small paddles
 GameSelectDebounce .byte ; debounce for game select switch
 CurrentSpriteHeight .byte ; altura atual dos sprites
 CurrentSpritePtr .word ; ponteiro para o sprite atual (low byte, high byte)
+GameFieldColor .byte ; cor da linha do campo de jogo
 
 ; Horizontal position players 2 bytes
 HorizPosPlayer0	.byte
@@ -47,6 +48,7 @@ BallPosY	.byte
 BallDirection	.byte	; Byte 7 y dir - bit 6 for x dir 
 BallDirCounter	.byte
 BallEnable	.byte
+BallColor	.byte	; cor da bola
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -87,6 +89,11 @@ Start
         sta CurrentSpritePtr+1
         lda #0
         sta CountScoreFrame
+        ldx #0			; Initialize with mode 0
+        lda GameFieldLineColors,x	; Initialize game field color (green)
+        sta GameFieldColor
+        lda #$0E		; Initialize ball color (white/bright)
+        sta BallColor
         
         lda #%00000010
         sta BallEnable
@@ -148,6 +155,8 @@ GameSelectDone
         ldx GameMode
         lda GameModeColors,x
         sta COLUPF
+        lda GameFieldLineColors,x
+        sta GameFieldColor
         jmp GameSelectNotPressed
 GameSelectNotPressed
         lda GameSelectDebounce
@@ -169,7 +178,8 @@ NoDebounceDecrement
         lda #%0000001
 	sta CTRLPF
         
-        lda #$C2
+        ldx GameMode
+        lda GameModeColors,x
         sta COLUPF
         
         lda Score0
@@ -270,7 +280,8 @@ ScanLoop1a
         
         lda #%00010001
 	sta CTRLPF        
-	lda #$C2
+	ldx GameMode
+        lda GameModeColors,x
         sta COLUPF
 	lda #%11111111
         sta PF0
@@ -322,7 +333,7 @@ Finished
 ; Section game field
         ldx #160-4
 
-        lda #$0E
+        lda GameFieldColor
         sta COLUPF
         
         lda #0
@@ -378,7 +389,8 @@ InSprite0
 
 
 ; Lower part of the playfield
-	lda #$C2
+	ldx GameMode
+        lda GameModeColors,x
         sta COLUPF
         
        	lda #%11111111
@@ -758,9 +770,15 @@ GetBCDBitmap subroutine
 
 ; Game mode colors for visual feedback
 GameModeColors
-        .byte $C2	; Mode 0: Normal - cyan
+        .byte $C2	; Mode 0: Normal - green
         .byte $46	; Mode 1: Fast ball - red  
-        .byte $D6	; Mode 2: Small paddles - purple
+        .byte $63	; Mode 2: Small paddles - purple
+
+; Game field line colors for each mode
+GameFieldLineColors
+        .byte $09	; Mode 0: Normal - green
+        .byte $28	; Mode 1: Fast ball - orange
+        .byte $EA	; Mode 2: Small paddles - green
 
 ; Bitmap pattern for digits
 DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
@@ -846,7 +864,7 @@ PlayerSpriteBig
         .byte #%01111110;-- linha 36
         .byte #%01111110;-- linha 37
         .byte #%01111110;-- linha 38
-        .byte #%01111110;-- linha 39
+        .byte #%00111100;-- linha 39
         .byte #%00111100;-- linha 40
         .byte #%00011000;-- linha 41
         
