@@ -4,7 +4,6 @@
 	include "xmacro.h"
         
 SpriteHeight	equ 33
-SpriteHeightBig	equ 50
 ColorP0		equ $48
 ColorP1		equ $a8
 ScoreToWin	equ $20
@@ -396,8 +395,8 @@ InSprite0
 
 	sed
 	lda BallPosX
-        cmp #$9D
-        bne NoHitRightWall
+        cmp #$9B	; Check if >= 155 (was hitting exactly 157)
+        bcc NoHitRightWall
         lda #0
         sta ScoredPlayer0
         lda Score0
@@ -423,8 +422,8 @@ SetWin0
 NoHitRightWall
 
 	lda BallPosX
-        cmp #8
-        bne NoHitLeftWall
+        cmp #10		; Check if <= 10 (was hitting exactly 8)
+        bcs NoHitLeftWall
         lda #1
         sta ScoredPlayer0
         lda Score1
@@ -838,5 +837,5 @@ SetHorizPos SUBROUTINE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	org $f7fc
-        .word Start	; reset vector
-        .word Start	; BRK vector
+        .word Start	; reset vectora
+        .word Start	; BRK vectordaw
