@@ -1,34 +1,41 @@
+<<<<<<< Updated upstream
 ; Table Top Tennis Simulator 2012
+=======
+; Table Top Tennis Simulator 2012 - Otimizado
+>>>>>>> Stashed changes
 
 	processor 6502
-	include vcs.h
+	include "vcs.h"
 	org $F000
 
 ;Constants
 BGColor = $48
 PFColor = $34
-P0Color = $C6 ; Green
-P1Color = $94 ; Blue
-BallColor = $0E ; White
-PF0Sprite = %00110000
+P0Color = $C6
+P1Color = $94
 PaddleOnSprite = %00011000
 PaddleOffSprite = %00000000
 BallOn = %00000010
 BallOff = %00000000
 PaddleHeight = 16
 BallHeight = 2
-MaxPaddleY = 186-PaddleHeight
+MaxPaddleY = 170
 MinPaddleY = 14
 P1Goal = $33; 100% Correct. Looked at wrong var. ; One cycle before playfield goal.
 P0Goal = $C2; 100% Correct. Looked at wrong var. ; One cycle before playfield goal.
 BallStartX = $7A
 BallStartY = 96
 BallBaseTone = %00000001
+<<<<<<< Updated upstream
 BallXSpeedCap = 2 ; !Exceeding the paddle width can cause tunneling!
 BallYSpeedCap = 3
 BallYExVelMax = BallYSpeedCap+1
 BallYExVelMin = 255-BallYSpeedCap
 BallVolleyIncrement = 2
+=======
+BallYExVelMax = 4
+BallYExVelMin = 252
+>>>>>>> Stashed changes
 AITickRate = 2
 ScoreLimit = 11
 StartingWaitTime = 255
@@ -56,6 +63,11 @@ AITicks = $90
 VictoryTime = $91
 WaitTime = $92
 NewXVelBall = $93
+<<<<<<< Updated upstream
+=======
+P0HorizMove = $94
+P1HorizMove = $95
+>>>>>>> Stashed changes
 
 Start
 	SEI ; Disable interrupts.
@@ -141,7 +153,6 @@ PositionPaddles ; DO NOT TOUCH
 	STA WSYNC
 	STA WSYNC
 
-EndInitialize
 MainLoop
 Synching
 	LDA #%00000010
@@ -149,6 +160,7 @@ Synching
 	STA WSYNC ; Need to hold the VSync signal for at least 3 scanlines.
 	STA WSYNC
 	STA WSYNC
+<<<<<<< Updated upstream
 	; 2798 cycles to burn divided by 64 = 43. 
 	; 64 is the number of cycles it takes for the timer to tick down.
 	; It's best to use a timer here since otherwise you'll have to manually count
@@ -166,11 +178,49 @@ BeginInput
 	LDA #0
 	STA AUDC0 ; Turn off any ricochet or scoring sound effects.
 	STA P0Delta ; Reset paddle movement deltas.
+=======
+	STA WSYNC
+	LDA #43
+	STA TIM64T
+	LDA #0
+	STA VSYNC
+BeginInput
+	STA AUDC0
+	STA P0Delta
+>>>>>>> Stashed changes
 	STA P1Delta
 	LDA VictoryTime
-	BNE EndInput
-P0Up
+	BEQ ContinueInput
+	JMP EndInput
+ContinueInput
+	; P0 Input
+	LDA SWCHA
+	AND #%00010000
+	BNE P0DownCheck
+	INC YPosP0
+	INC YPosP0
+	LDA #1
+	STA P0Delta
+P0DownCheck
+	LDA SWCHA
+	AND #%00100000
+	BNE P0LeftCheck
+	DEC YPosP0
+	DEC YPosP0
+	LDA #-1
+	STA P0Delta
+P0LeftCheck
+	LDA SWCHA
+	AND #%01000000
+	BNE P0RightCheck
+	LDA #%11110000
+	STA P0HorizMove
+P0RightCheck
+	LDA SWCHA
+	AND #%10000000
+	BNE P1UpCheck
 	LDA #%00010000
+<<<<<<< Updated upstream
 	BIT SWCHA
 	BNE P0Down
 	INC YPosP0 ; Always increment/decrement paddle positions by 2. Only every other scanline changes the graphics registers,
@@ -217,8 +267,82 @@ P0Playfield ; Test for Paddle-on-Playfield collisions so they don't move outside
 	STA YPosP0 ; Store to actual variable.
 P1Playfield ; Repeat for P1.
 	LDA #%10000000 ; CXP1FB (P1->PF)
+=======
+	STA P0HorizMove
+	; P1 Input
+P1UpCheck
+	LDA SWCHA
+	AND #%00000001
+	BNE P1DownCheck
+	INC YPosP1
+	INC YPosP1
+	LDA #1
+	STA P1Delta
+P1DownCheck
+	LDA SWCHA
+	AND #%00000010
+	BNE P1LeftCheck
+	DEC YPosP1
+	DEC YPosP1
+	LDA #-1
+	STA P1Delta
+P1LeftCheck
+	LDA SWCHA
+	AND #%00000100
+	BNE P1RightCheck
+	LDA #%11110000
+	STA P1HorizMove
+P1RightCheck
+	LDA SWCHA
+	AND #%00001000
+	BNE ApplyHMovement
+	LDA #%00010000
+	STA P1HorizMove
+ApplyHMovement
+	LDA P0HorizMove
+	BEQ SkipP0H
+	STA HMP0
+	STA WSYNC
+	STA HMOVE
+	STA HMCLR
+SkipP0H
+	LDA P1HorizMove
+	BEQ EndInput
+	STA HMP1
+	STA WSYNC
+	STA HMOVE
+	STA HMCLR
+EndInput
+BeginCollision
+	LDA #%10000000
+	BIT CXP0FB
+	BEQ CheckP1PF
+	LDA P0HorizMove
+	BEQ P0VWall
+	LDA #0
+	STA P0HorizMove
+	STA HMP0
+	JMP CheckP1PF
+P0VWall
+	PHA
+	LDA YPosP0
+	PHA
+	JSR CapToMinMax
+	PLA
+	PLA
+	STA YPosP0
+CheckP1PF
+	LDA #%10000000
+>>>>>>> Stashed changes
 	BIT CXP1FB
-	BEQ PlayerBallCheck
+	BEQ CheckBall
+	LDA P1HorizMove
+	BEQ P1VWall
+	LDA #0
+	STA P1HorizMove
+	STA HMP1
+	JMP CheckBall
+P1VWall
 	PHA
 	LDA YPosP1
 	PHA
@@ -226,40 +350,50 @@ P1Playfield ; Repeat for P1.
 	PLA
 	PLA
 	STA YPosP1
+<<<<<<< Updated upstream
 PlayerBallCheck ; Check if we need to bounce the ball off a paddle.
+=======
+CheckBall
+>>>>>>> Stashed changes
 	LDA WaitTime
-	BEQ SkipWaitCheck
+	BEQ TestPaddles
 	DEC WaitTime
 	LDA WaitTime
 	CMP #EndWaitTime
-	BNE SkipBallPhysics
-	JMP ClearWait
-SkipBallPhysics
+	BEQ DoReset
 	JMP EndCollision
-ClearWait
+DoReset
 	LDA #0
 	STA WaitTime
 	JSR ResetBall
-SkipWaitCheck
+TestPaddles
 	LDA P0Delta
 	PHA ; Push P0's delta onto the stack.
 	LDA #%01000000 ; CXP0FB (P0->BL)
 	BIT CXP0FB
+<<<<<<< Updated upstream
 	BNE PlayerBallConfirmed ; If there's a hit between P0 and the PF, branch with P0's delta still on the stack.
 	PLA ; Else, pop it off and put P1's delta in its place.
+=======
+	BNE BallHit
+	PLA
+>>>>>>> Stashed changes
 	LDA P1Delta
 	PHA
 	LDA #%01000000
 	BIT CXP1FB
+<<<<<<< Updated upstream
 	BNE PlayerBallConfirmed ; If there's a hit between P1 and the PF, branch with P1's delta on the stack.
 	PLA ; Else there were no hits, pop it off stack so we don't overflow and JMP to the next collision test.
 	JMP BallPlayfield
 PlayerBallConfirmed ; Only executed if any of the paddles hit the ball.
+=======
+	BNE BallHit
+	PLA
+	JMP TestBallPF
+BallHit
+>>>>>>> Stashed changes
 	INC VolleyCount
-	LDA VolleyCount
-	CMP #BallVolleyIncrement
-	BNE BallVelChanges
-BallVelChanges
 	LDA XVelBall
 	CLC
 	EOR #$FF
@@ -269,11 +403,11 @@ BallVelChanges
 	CLC			 ; clear the carry, and add it to the YVelocity. This could either slow or speed up the ball's Y speed.
 	ADC YVelBall ; This is how applying "spin" to the ball is done. If you move while hitting the ball, all this happens.
 	CMP #BallYExVelMax
-	BEQ CapBallToUpper
+	BCS CapUpper
 	CMP #BallYExVelMin
-	BEQ CapBallToLower
-
+	BCC CapLower
 	CMP #0
+<<<<<<< Updated upstream
 	JMP BallZeroYCheck
 CapBallToUpper
 	LDA #BallYExVelMax-1
@@ -314,11 +448,45 @@ TestBallP1 ; Repeat for P1. Could these be combined into 1
 	BCS BallRicochet
 	; We're in P1's Goal!
 	LDA #-1 ; P0 scored.
+=======
+	BNE SetYVel
+	LDA #1
+	JMP SetYVel
+CapUpper
+	LDA #BallYExVelMax-1
+	JMP SetYVel
+CapLower
+	LDA #BallYExVelMin+1
+SetYVel
+	STA YVelBall
+	LDA #BallBaseTone
+	STA AUDC0
+TestBallPF
+	LDA #%10000000
+	BIT CXBLPF
+	BEQ EndCollision
+	LDA XPosBall
+	CMP #P0Goal
+	BCC TestP1Goal
+	LDA #1
 	PHA
 	JSR OnScore
 	PLA
 	JMP EndCollision
+TestP1Goal
+	CMP #P1Goal
+	BCS Ricochet
+	LDA #-1
+>>>>>>> Stashed changes
+	PHA
+	JSR OnScore
+	PLA
+	JMP EndCollision
+<<<<<<< Updated upstream
 BallRicochet ; Didn't hit a player, guess we hit a wall.
+=======
+Ricochet
+>>>>>>> Stashed changes
 	LDA YVelBall
 	CLC
 	EOR #$FF ; Just flip the value and play a sound.
@@ -354,7 +522,6 @@ EndCollision
 	STA COLUBK ; Reset background color.
 	LDA %00000001 ; Turn off Player coloring and go back to mirroring the playfield.
 	STA CTRLPF
-	LDX #0
 	LDA ScoreP0
 	; Wow it makes a lot more sense to do this here. Who'd a thunk.
 	ASL ; Each number graphic is made up of 8 bytes, so multiply our score by 8 to get the memory address of the number we want.
@@ -366,9 +533,12 @@ EndCollision
 	ASL
 	ASL
 	STA ScoreP1MemLoc
+<<<<<<< Updated upstream
 	LDA YPosBall ; Locks the paddles to the ball so they never miss. For testing.
 	;STA YPosP0
 	;STA YPosP1
+=======
+>>>>>>> Stashed changes
 ScoreCheck
 	LDA VictoryTime
 	BNE StillWinning
@@ -388,20 +558,17 @@ P1Won
 	INC ScoreP1
 	LDA #255
 	STA VictoryTime
-	JMP StillWinning
 StillWinning
 	JSR OnWin
 	LDA VictoryTime
-	BNE WaitForVBlankEnd
+	BNE WaitVBlank
 	LDA #0
 	STA AUDC1
 	JMP Start
 AICheck
 	LDA AITicks
 	CMP #AITickRate
-	BEQ AIStart
-	JMP AIEnd
-AIStart
+	BNE AIEnd
 	LDA #0
 	STA AITicks
 	LDA YPosP1
@@ -416,11 +583,18 @@ AIDown
 	DEC YPosP1
 AIEnd
 	INC AITicks
+<<<<<<< Updated upstream
 ; Kill whatever time might be left.
 WaitForVBlankEnd
 	LDA INTIM
 	BNE WaitForVBlankEnd
 	STA WSYNC ; WSYNC so we don't enable drawing mid-way into the line.
+=======
+WaitVBlank
+	LDA INTIM
+	BNE WaitVBlank
+	STA WSYNC
+>>>>>>> Stashed changes
 	STA VBLANK
 	LDY #192 ; Note we only actually loop 182 times, but we're counting down from 192.
 ScanLoop
@@ -433,49 +607,63 @@ ScanLoop
 	; far far far too little time to perform both kernels' functions on one scanline.
 	; The fact that the graphics registers are only updated on odd scanlines has a lot of implications!
 	STA WSYNC
-ProcessingLine
 	TYA
 	SEC ; Have to set carry because SBC uses the not of the carry.
 		; Meaning you otherwise get things like $60 - $60 = $FF
 		; This causes a weird bug where paddles can shift the other around by 1 line.
 	SBC YPosP0
+<<<<<<< Updated upstream
 	BMI DisableP0 ; Basically: if (CurrentScanline - YPosP0) < 0 : Turn off paddle
 	CMP #PaddleHeight ; else if (CurrentScanline - YPosP0) >= PaddleHeight : Turn off paddle.
 	BCS DisableP0	  ; else : Enable paddle.
+=======
+	BMI DisP0
+	CMP #PaddleHeight
+	BCS DisP0
+>>>>>>> Stashed changes
 	LDA #PaddleOnSprite
 	STA P0Sprite
-	JMP P1Check
-DisableP0
+	JMP ChkP1
+DisP0
 	LDA #PaddleOffSprite
 	STA P0Sprite
+<<<<<<< Updated upstream
 P1Check ; Repeat for P1...
+=======
+ChkP1
+>>>>>>> Stashed changes
 	TYA
 	SEC
 	SBC YPosP1
-	BMI DisableP1
+	BMI DisP1
 	CMP #PaddleHeight
-	BCS DisableP1
+	BCS DisP1
 	LDA #PaddleOnSprite
 	STA P1Sprite
-	JMP BallCheck
-DisableP1
+	JMP ChkBall
+DisP1
 	LDA #PaddleOffSprite
 	STA P1Sprite
+<<<<<<< Updated upstream
 BallCheck ; And the ball...
+=======
+ChkBall
+>>>>>>> Stashed changes
 	LDA VictoryTime
-	BNE DisableBall
+	BNE DisBall
 	TYA
 	SEC
 	SBC YPosBall
-	BMI DisableBall
+	BMI DisBall
 	CMP #BallHeight
-	BCS DisableBall
+	BCS DisBall
 	LDA #BallOn
 	STA BallEnabled
-	JMP EndLineChecks
-DisableBall
+	JMP DrawLine
+DisBall
 	LDA #BallOff
 	STA BallEnabled
+<<<<<<< Updated upstream
 EndLineChecks 
 EndProcessingLine
 DrawLine ; All we pretty much do here is load in the processing kernel's results and store them in the graphics registers.
@@ -484,6 +672,13 @@ DrawLine ; All we pretty much do here is load in the processing kernel's results
 	STA WSYNC ; Sync to draw kernel line.
 	LDA Playfield0,Y ; Save some horizontal blank time.
 	STA COLUPF ; The color of the playfield is just PF0's current graphic. Yeah.
+=======
+DrawLine
+	DEY
+	STA WSYNC
+	LDA Playfield0,Y
+	STA COLUPF
+>>>>>>> Stashed changes
 	STA PF0
 	LDA Playfield1,Y
 	STA PF1
@@ -497,9 +692,14 @@ DrawLine ; All we pretty much do here is load in the processing kernel's results
 	; Subtract 1 off our line counter.
 	DEY
 	CPY #10
+<<<<<<< Updated upstream
 	; Loop for the next scanline.
 	BNE ScanLoop ; All finished within the horizontal blank.
 ScoreDrawLine ; Starts on the 10th remaining visible scanline. Draws the score for each player.
+=======
+	BNE ScanLoop
+ScoreDraw
+>>>>>>> Stashed changes
 	LDA #0
 	STA WSYNC
 	LDA Playfield0,Y
@@ -536,9 +736,7 @@ ScoreLoop ; The actual number drawing loop. X counts from 0 to 8 and branches on
 	INC ScoreP0MemLoc
 	INC ScoreP1MemLoc
 	DEX
-	BEQ EndScore
-	JMP ScoreLoop
-EndScore
+	BNE ScoreLoop
 	LDA #0
 	STA WSYNC
 	STA PF1
@@ -554,15 +752,23 @@ EndScore
 	; We get 30 lines of overscan.
 	; Why not use a timer like the vertical blank?
 	LDY #29
+<<<<<<< Updated upstream
 ; Y=$08 is first scanline of bottom border.
 ; Y=$07 is first scanline of brown part of it.
 OverScanWait
 	; Wait for line to finish...
+=======
+OverscanWait
+>>>>>>> Stashed changes
 	STA WSYNC
 	; Decrement and loop.
 	DEY
+<<<<<<< Updated upstream
 	BNE OverScanWait
 	; Back to main.
+=======
+	BNE OverscanWait
+>>>>>>> Stashed changes
 	JMP MainLoop
 ; < Return Address > -> ToCap -> Min -> Max -> RetVal
 ; int CapToMinMax(byte ToCap)
@@ -577,15 +783,15 @@ CapToMinMax
 CapMin
 	LDA #MinPaddleY
 	CMP ToCap,X
-	BCC CapReturn
+	BCC CapRet
 	STA ToCap,X
-	JMP CapReturn
+	JMP CapRet
 CapMax
 	LDA #MaxPaddleY
 	CMP ToCap,X
-	BCS CapReturn
+	BCS CapRet
 	STA ToCap,X
-CapReturn
+CapRet
 	LDA ToCap,X
 	STA CapRetVal,X
 	RTS
@@ -597,14 +803,17 @@ OnScore
 	TSX
 	LDA PlayerWhoScored,X
 	CMP #-1
-	BEQ P0Scored
-P1Scored
+	BEQ IncP0
 	INC ScoreP1
-	JMP PostScored
-P0Scored
+	JMP PostScore
+IncP0
 	INC ScoreP0
+<<<<<<< Updated upstream
 PostScored
 	; Subtract one from PlayerWhoScored ASL and set as HM?
+=======
+PostScore
+>>>>>>> Stashed changes
 	JSR ResetBall
 	LDA #0
 	STA XVelBall
@@ -615,7 +824,6 @@ PostScored
 	ASL
 	ASL
 	ASL
-	STA XVelBall
 	STA NewXVelBall
 	LDA #%00001000
 	STA AUDC0
@@ -658,12 +866,12 @@ ResetBall
 	CLC
 	ADC ScoreP1
 	TAY
-	LDA StartingYVelTable,Y
+	LDA YVelTable,Y
 	STA YVelBall
 	LDA NewXVelBall
-	BNE SkipResetXVel
+	BNE SkipXVel
 	LDA #%00010000
-SkipResetXVel
+SkipXVel
 	STA XVelBall
 	LDA #0
 	STA VolleyCount
@@ -673,399 +881,70 @@ OnWin
 	LDA #%00001000
 	STA AUDC1
 	DEC VictoryTime
-	BNE OnWinReturn
+	BNE WinRet
 	LDA #0
 	STA AUDC1
-OnWinReturn
+WinRet
 	RTS
 Playfield0
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %00110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
-	.byte %11110000
+	.byte %11110000,%11110000,%11110000,%11110000,%11110000,%11110000,%11110000
+	.byte %11110000,%11110000,%11110000,%11110000,%11110000,%11110000,%11110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %00110000,%00110000,%00110000,%00110000,%00110000,%00110000,%00110000
+	.byte %11110000,%11110000,%11110000,%11110000,%11110000,%11110000,%11110000
+	.byte %11110000,%11110000,%11110000
 Playfield1
 Playfield2
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %00000000
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
-	.byte %11111111
+	.byte %11111111,%11111111,%11111111,%11111111,%11111111,%11111111,%11111111
+	.byte %11111111,%11111111,%11111111,%11111111,%11111111,%11111111,%11111111
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %00000000,%00000000,%00000000,%00000000,%00000000,%00000000,%00000000
+	.byte %11111111,%11111111,%11111111,%11111111,%11111111,%11111111,%11111111
+	.byte %11111111,%11111111,%11111111
 Numbers
+<<<<<<< Updated upstream
 Zero
 	.byte %00000111
 	.byte %00000101
@@ -1206,6 +1085,23 @@ StartingYVelTable ; Picks a "random" Y direction for the ball.
 	.byte %11111111
 ;************************************************************   
 ; Special memory locations. Tells the 6502 where to go.
+=======
+	.byte %00000111,%00000101,%00000101,%00000101,%00000101,%00000101,%00000101,%00000111
+	.byte %00000010,%00000010,%00000010,%00000010,%00000010,%00000010,%00000010,%00000010
+	.byte %00000111,%00000001,%00000001,%00000010,%00000010,%00000100,%00000100,%00000111
+	.byte %00000111,%00000001,%00000001,%00000111,%00000001,%00000001,%00000001,%00000111
+	.byte %00000101,%00000101,%00000101,%00000111,%00000001,%00000001,%00000001,%00000001
+	.byte %00000111,%00000100,%00000100,%00000111,%00000001,%00000001,%00000001,%00000111
+	.byte %00000100,%00000100,%00000100,%00000100,%00000111,%00000101,%00000101,%00000111
+	.byte %00000111,%00000001,%00000001,%00000001,%00000001,%00000001,%00000001,%00000001
+	.byte %00000111,%00000101,%00000101,%00000111,%00000101,%00000101,%00000101,%00000111
+	.byte %00000111,%00000101,%00000101,%00000111,%00000001,%00000001,%00000001,%00000001
+	.byte %00010111,%00010101,%00010101,%00010101,%00010101,%00010101,%00010101,%00010111
+	.byte %00010100,%00010100,%00010100,%00010100,%00010100,%00010100,%00010100,%00010100
+YVelTable
+	.byte 1,255,255,0,1,1,255,255,1,255,0,1,255,1,255,0,1,0,1,255
+
+>>>>>>> Stashed changes
 	org $FFFC
 	.word Start
 	.word Start

@@ -1,0 +1,165 @@
+--- Symbol List (sorted by symbol)
+0.FREE_BYTES             0000                  
+1.CLEAR_STACK            f006              (R )
+10.loop1                 f35c              (R )
+10.loop2                 f37e              (R )
+11.DivideLoop            f756              (R )
+2.VSLP1                  f060              (R )
+3.cycles                 0aef              (R )
+3.lines                  0025              (R )
+4.waittimer              f0a1              (R )
+5.CYCLES                 0018              (R )
+6.cycles                 029f              (R )
+6.lines                  0009              (R )
+7.waittimer              f12d              (R )
+8.cycles                 088f              (R )
+8.lines                  001d              (R )
+9.waittimer              f344              (R )
+AUDC0                    0015              (R )
+AUDC1                    0016                  
+AUDF0                    0017              (R )
+AUDF1                    0018                  
+AUDV0                    0019              (R )
+AUDV1                    001a                  
+BallDirCounter           0099              (R )
+BallDirection            0098              (R )
+BallEnable               009a              (R )
+BallPosX                 0096              (R )
+BallPosY                 0097              (R )
+CheckMovement            f283              (R )
+ColorP0                  0048              (R )
+ColorP1                  00a8              (R )
+ColorScoreP0             0091              (R )
+ColorScoreP1             0092              (R )
+COLUBK                   0009                  
+COLUP0                   0006              (R )
+COLUP1                   0007              (R )
+COLUPF                   0008              (R )
+CountScoreFrame          0093              (R )
+CTRLPF                   000a              (R )
+CXBLPF                   0006                  
+CXCLR                    002c              (R )
+CXM0FB                   0004                  
+CXM0P                    0000                  
+CXM1FB                   0005                  
+CXM1P                    0001                  
+CXP0FB                   0002              (R )
+CXP1FB                   0003              (R )
+CXPPMM                   0007                  
+DecX                     f21b              (R )
+DecY                     f226              (R )
+DigitsBitmap             f700              (R )
+DoNotCheckPlayerHitBall  f2fe              (R )
+ENABL                    001f              (R )
+ENAM0                    001d                  
+ENAM1                    001e                  
+Finished                 f12d              (R )
+FontBuf                  0087              (R )
+GetBCDBitmap             f34e              (R )
+GRP0                     001b              (R )
+GRP1                     001c              (R )
+HMBL                     0024                  
+HMCLR                    002b                  
+HMM0                     0022                  
+HMM1                     0023                  
+HMOVE                    002a              (R )
+HMP0                     0020              (R )
+HMP1                     0021                  
+HorizPosPlayer0          0081              (R )
+HorizPosPlayer1          0082              (R )
+INPT0                    0008                  
+INPT1                    0009                  
+INPT2                    000a                  
+INPT3                    000b                  
+INPT4                    000c                  
+INPT5                    000d                  
+InSprite0                f172              (R )
+InSprite1                f162              (R )
+INTIM                    0284              (R )
+Loop                     f148              (R )
+NextFrame                f059              (R )
+NO_ILLEGAL_OPCODES       0000 ????         (R )
+NoActionScore            f336              (R )
+NoBallCounterDec         f300              (R )
+NoCheckMovement          f27f              (R )
+NoCheckWin               f331              (R )
+NoHitBottomWall          f322              (R )
+NoHitLeftWall            f20d              (R )
+NoHitPlayer0             f2e9              (R )
+NoHitPlayer1             f2fb              (R )
+NoHitRightWall           f1df              (R )
+NoHitTopWall             f312              (R )
+NoMovP0Down              f237              (R )
+NoMovP0Left              f24b              (R )
+NoMovP0Right             f254              (R )
+NoMovP0Up                f242              (R )
+NoMovP1Down              f25f              (R )
+NoMovP1Left              f273              (R )
+NoMovP1Right             f27c              (R )
+NoMovP1Up                f26a              (R )
+NotWonYet0               f1ca              (R )
+NotWonYet1               f1f8              (R )
+NUSIZ0                   0004              (R )
+NUSIZ1                   0005                  
+P0HorizOK1               f2b5              (R )
+P0HorizOK2               f2bf              (R )
+P0VertOK1                f297              (R )
+P0VertOK2                f2ab              (R )
+P1HorizOK1               f2c9              (R )
+P1HorizOK2               f2d3              (R )
+P1VertOK1                f28d              (R )
+P1VertOK2                f2a1              (R )
+PF0                      000d              (R )
+PF1                      000e              (R )
+PF2                      000f              (R )
+PlayerSprite             f732              (R )
+PlayerWin                0095              (R )
+PosPlayer0               0083              (R )
+PosPlayer1               0084              (R )
+REFP0                    000b                  
+REFP1                    000c                  
+RESBL                    0014                  
+RESM0                    0012                  
+RESM1                    0013                  
+RESMP0                   0028                  
+RESMP1                   0029                  
+RESP0                    0010              (R )
+RESP1                    0011                  
+RSYNC                    0003                  
+ScanLoop1a               f0e0              (R )
+Score0                   0085              (R )
+Score1                   0086              (R )
+ScoreCheckCompleted      f344              (R )
+ScoredPlayer0            0094              (R )
+ScoreToWin               0020              (R )
+SetBall                  f156              (R )
+SetHorizPos              f753              (R )
+SetScoreColor            f341              (R )
+SetWin0                  f1cc              (R )
+SetWin1                  f1fa              (R )
+SpriteHeight             0021              (R )
+Start                    f000              (R )
+SWACNT                   0281                  
+SWBCNT                   0283                  
+SWCHA                    0280              (R )
+SWCHB                    0282              (R )
+T1024T                   0297                  
+Temp                     0080              (R )
+TIA_BASE_ADDRESS         0000              (R )
+TIA_BASE_READ_ADDRESS    0000              (R )
+TIA_BASE_WRITE_ADDRESS   0000              (R )
+TIM1T                    0294                  
+TIM64T                   0296              (R )
+TIM8T                    0295                  
+TIMINT                   0285                  
+VBLANK                   0001                  
+VDELBL                   0027                  
+VDELP0                   0025                  
+VDELP1                   0026              (R )
+VERSION_MACRO            006a                  
+VERSION_VCS              0069                  
+VSYNC                    0000              (R )
+WSYNC                    0002              (R )
+XDirection               f21d              (R )
+YDirection               f228              (R )
+--- End of Symbol List.
