@@ -247,7 +247,7 @@ NoDebounceDecrement
         sty PF0
         sty PF1
         sty PF2
-        lda #%00010010	; score mode + 2 pixel ball
+        lda #%11011010	; score mode + 2 pixel ball
         sta CTRLPF
         lda ColorScoreP0
         sta COLUP0	; set color for left
@@ -353,7 +353,7 @@ Loop
         ldy #%00000000
         sec		; set carry for subtract
         sbc BallPosY	; local coordinate
-        cmp #4 ; in sprite?
+        cmp #2 ; in sprite?
         bcs SetBall	; yes, skip over next
         ldy BallEnable	; lookup frame data
 SetBall
