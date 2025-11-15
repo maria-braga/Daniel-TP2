@@ -432,6 +432,13 @@ InSprite0
 	lda BallPosX
         cmp #$9B	; Check if >= 155 (was hitting exactly 157)
         bcc NoHitRightWall
+        ;nova funcionalidade começa  aser implementada aqui - parede da direita com gol
+        lda BallPosY
+        cmp #60
+        bcc BounceRightWall
+        cmp #120 
+        bcs BounceRightWall
+        ;lógica de pontuação original daqui para baixo
         lda #0
         sta ScoredPlayer0
         lda Score0
@@ -461,11 +468,28 @@ SetWin0
         lda Score0
         adc #1
         sta Score0
+
+BounceRightWall:
+        lda BallDirection
+        eor #%01000000     ; reverse X direction
+        sta BallDirection
+        jmp NoHitRightWall ; skip scoring
+
 NoHitRightWall
 
 	lda BallPosX
         cmp #10		; Check if <= 10 (was hitting exactly 8)
         bcs NoHitLeftWall
+        ;Gol da esquerda
+        lda BallPosX
+        cmp #10               ; <= 10 ?
+        bcs NoHitLeftWall     ; no
+        lda BallPosY
+        cmp #60
+        bcc BounceLeftWall     ; solid wall
+        cmp #120
+        bcs BounceLeftWall     ; solid wall
+        ;lógica original
         lda #1
         sta ScoredPlayer0
         lda Score1
@@ -495,6 +519,12 @@ SetWin1
         lda Score1
         adc #1
         sta Score1
+BounceLeftWall:
+        lda BallDirection
+        eor #%01000000    ; reverse X direction
+        sta BallDirection
+        jmp NoHitLeftWall ; skip scoring
+
 NoHitLeftWall
 	cld
         
