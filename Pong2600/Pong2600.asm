@@ -10,55 +10,55 @@ ColorP1		equ $a8
 ScoreToWin	equ $20
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Variables segment
+; Variáveis de segmento
 
         seg.u Variables
 	org $80
 
 Temp		.byte
 
-; Game mode variable
-GameMode	.byte	; 0 = normal, 1 = fast ball, 2 = small paddles
-GameSelectDebounce .byte ; debounce for game select switch
+; Variável de modo de jogo
+GameMode	.byte	; 0 = normal, 1 = bola rápida, 2 = paddles pequenos
+GameSelectDebounce .byte ; debounce para switch de game select
 CurrentSpriteHeight .byte ; altura atual dos sprites
 CurrentSpritePtr .word ; ponteiro para o sprite atual (low byte, high byte)
 GameFieldColor .byte ; cor da linha do campo de jogo
 
-; Horizontal position players 2 bytes
+; Posição horizontal dos jogadores -> 2 bytes
 HorizPosPlayer0	.byte
 HorizPosPlayer1	.byte
 
-; Vertical position players 2 bytes
+; Posição vertical dos jogadores -> 2 bytes
 PosPlayer0	.byte
 PosPlayer1	.byte
 
-; For scoreboard 17 bytes
-Score0		.byte	; BCD score of player 0
-Score1		.byte	; BCD score of player 1
-FontBuf		.ds 10	; 2x5 array of playfield bytes
+; Placar de pontuação -> 17 bytes
+Score0		.byte	; BCD de pontuação do jogador 0
+Score1		.byte	; BCD de pontuação do jogador 1
+FontBuf		.ds 10	; vetor de 2x5 bytes do campo de jogo
 ColorScoreP0	.byte
 ColorScoreP1	.byte
 CountScoreFrame .byte
-ScoredPlayer0	.byte	; 0 scored player 0, 1 scored player 1
+ScoredPlayer0	.byte	; 0 pontuado jogador 0, 1 pontuado jogador 1
 PlayerWin	.byte
 
-; Ball coordinates and direction 5 bytes
+; Coordenadas da bola e direção -> 5 bytes
 BallPosX	.byte
 BallPosY	.byte
-BallDirection	.byte	; Byte 7 y dir - bit 6 for x dir 
+BallDirection	.byte	; Byte 7 y dir - bit 6 para x dir 
 BallDirCounter	.byte
 BallEnable	.byte
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Code segment
+; Segmento de código
 
 	seg Code
         org $f000
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Start and Initialization
+; Start e Inicialização
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 Start
 	CLEAN_START
@@ -67,7 +67,7 @@ Start
         lda #37
         sta PosPlayer1  
 
-        ; Initialize horizontal positions
+        ; Inicializa posições horizontais
         lda #10
         sta HorizPosPlayer0
         lda #148
@@ -88,8 +88,8 @@ Start
         sta CurrentSpritePtr+1
         lda #0
         sta CountScoreFrame
-        ldx #0			; Initialize with mode 0
-        lda GameFieldLineColors,x	; Initialize game field color (green)
+        ldx #0			; Inicializa com modo 0
+        lda GameFieldLineColors,x	; Inicializa a cor do campo de jogo (verde)
         sta GameFieldColor
         
         lda #%00000010
@@ -129,26 +129,26 @@ Start
 ; Game Loop
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 NextFrame
-        lsr SWCHB	; test Game Reset switch
+        lsr SWCHB	; testa switch de Game Reset
         bcc Start	; reset?
 
-; Check Game Select switch
+; Confere switch de Game Select
         lda SWCHB
-        and #%00000010	; test Game Select switch
+        and #%00000010	; testa switch de Game Select
         bne GameSelectNotPressed
         lda GameSelectDebounce
         bne GameSelectNotPressed
-        ; Game Select was pressed
+        ; Game Select foi pressionado
         lda #15
         sta GameSelectDebounce
         inc GameMode
         lda GameMode
-        cmp #3		; we have 3 modes (0, 1, 2)
+        cmp #3		; 3 modos (0, 1, 2)
         bcc GameSelectDone
         lda #0
         sta GameMode
 GameSelectDone
-        ; Visual feedback: change playfield color based on mode
+        ; Retorno visual: muda a cor do campo de acordo com o modo de jogo
         ldx GameMode
         lda GameModeColors,x
         sta COLUPF
@@ -162,11 +162,11 @@ GameSelectNotPressed
 NoDebounceDecrement
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; 1 + 3 lines of VSYNC
+; 1 + 3 linhas of VSYNC
 	VERTICAL_SYNC
         
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        
-; 37 lines of underscan
+; 37 linnhas de underscan
 	TIMER_SETUP 37
         
         lda #0
@@ -195,11 +195,11 @@ NoDebounceDecrement
         ldx #4
         jsr SetHorizPos
         
-        ; Set horizontal position player 0 (using variable)
+        ; Define posição horizontal do jogador 0 (usando variável)
         ldx #0
         lda HorizPosPlayer0
         jsr SetHorizPos
-        ; Set horizontal position player 1 (using variable)
+        ; Define posição vertical do jogador 1 (usando variável)
         ldx #1
         lda HorizPosPlayer1
         jsr SetHorizPos
@@ -210,17 +210,17 @@ NoDebounceDecrement
 	TIMER_WAIT
         
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;        
-; 192 lines of frame
+; 192 linhas por quadro
 
-; First part playfield
+; Primeira parte do campo de jogo
 
 
-; First, we'll draw the scoreboard.
-; Put the playfield into score mode (bit 2) which gives
-; two different colors for the left/right side of
-; the playfield (given by COLUP0 and COLUP1).
+; Primeiramente, desenhamos o placar
+; Colocamos o campo de jogo em modo de pontuação (bit 2) o que produz 
+; duas cores difrentes para os lados esquerdo e direito do
+; campo de jogo (COLUP0 e COLUP1) 
 
-; Now we draw all four digits.
+; Desenha-se todos os 4 dígitos 
 
         lda #%0000001
 	sta CTRLPF
@@ -243,27 +243,27 @@ NoDebounceDecrement
           sta WSYNC
 	REPEND
       
-        ldy #0		; Y will contain the frame Y coordinate
+        ldy #0		; Y conterá a coordenada Y do quadro
         sty PF0
         sty PF1
         sty PF2
-        lda #%11011010	; score mode + 2 pixel ball
+        lda #%11011010	; modo de pontuação + disco de 4 pixels
         sta CTRLPF
         lda ColorScoreP0
-        sta COLUP0	; set color for left
+        sta COLUP0	; define cor na esquerda
         lda ColorScoreP1
-        sta COLUP1	; set color for right        
+        sta COLUP1	; define cor na direita
         sta WSYNC
 ScanLoop1a
 	sta WSYNC
         tya
-        lsr		; divide Y by two for double-height lines
+        lsr		; divide Y em 2 para linhas com dobro de altura
         tax		; -> X
         lda FontBuf+0,x
-        sta PF1		; set left score bitmap
+        sta PF1		; define bitmap do placar da esquerda
         SLEEP 24
         lda FontBuf+5,x
-        sta PF1		; set right score bitmap
+        sta PF1		; define bitmap do placar da direita
         iny
         cpy #10
         bcc ScanLoop1a
@@ -271,7 +271,7 @@ ScanLoop1a
         
 	TIMER_SETUP 9
      
-        lda #0		; Y will contain the frame Y coordinate
+        lda #0		; Y conterá a coordenada Y do quadro
         sta PF0
         sta PF1
         sta PF2
@@ -292,18 +292,18 @@ ScanLoop1a
         lda PlayerWin
         bne Finished
         
-        ; Set sprite size and colors based on game mode
+        ; Define tamanho dos sprietes e cores baseadas no modo de jogo 
         lda GameMode
         cmp #2
         bne NormalSizeInGame
-        ; Mode 2: Small paddles (altura aumentada e sprite diferente)
+        ; Modo 2: paddles pequenos (altura aumentada e sprite diferente)
         lda #SpriteHeight
         sta CurrentSpriteHeight
         lda #<PlayerSprite
         sta CurrentSpritePtr
         lda #>PlayerSprite
         sta CurrentSpritePtr+1
-        lda #%00010000	; normal width with 2 pixel ball
+        lda #%00010000	; Largura do disco
         sta NUSIZ0
         lda #%00000000
         sta NUSIZ1
@@ -315,23 +315,23 @@ NormalSizeInGame
         sta CurrentSpritePtr
         lda #>PlayerSpriteBig
         sta CurrentSpritePtr+1
-        lda #%00010000	; normal size with 2 pixel ball
+        lda #%00010000	; Largura do disco
         sta NUSIZ0
         lda #%00000000
         sta NUSIZ1
 SizeDoneInGame
         
         lda #ColorP0
-        sta COLUP0	; set color for left
+        sta COLUP0	; define cor da esquerda
         lda #ColorP1
-        sta COLUP1	; set color for right
+        sta COLUP1	; define cor da direita
         
 Finished
 
         TIMER_WAIT
         
 
-; Section game field
+; Seção campo do jogo
         ldx #160-4
 
         lda GameFieldColor
@@ -346,50 +346,50 @@ Finished
         sta WSYNC
 Loop
 
-; Draw ball
+; Desenhar disco 
 	STA WSYNC
         
 	txa		; X -> A
         ldy #%00000000
-        sec		; set carry for subtract
-        sbc BallPosY	; local coordinate
-        cmp #2 ; in sprite?
-        bcs SetBall	; yes, skip over next
+        sec		; define carry para subtrair
+        sbc BallPosY	; coordenada local
+        cmp #2 
+        bcs SetBall	
         ldy BallEnable	; lookup frame data
 SetBall
-        sty ENABL	; store bitmap
+        sty ENABL	; armazena bitmap
 
-; Draw Sprites
+; Desenha sprites
 
 	; Sprite 1
 	txa		; X -> A
-        sec		; set carry for subtract
-        sbc PosPlayer1	; local coordinate
-        cmp CurrentSpriteHeight ; in sprite? (usa altura dinâmica)
-        bcc InSprite1	; yes, skip over next
-        lda #0		; not in sprite, load 0
+        sec		; define carry para subtrair
+        sbc PosPlayer1	; coordenada local
+        cmp CurrentSpriteHeight ; usa altura dinâmica
+        bcc InSprite1	
+        lda #0		; não está no sprite, carrega 0
 InSprite1
-	tay		; local coord -> Y
+	tay		; coordenada local -> Y
         lda (CurrentSpritePtr),y	; lookup frame data usando ponteiro
-        sta GRP1	; store bitmap
+        sta GRP1	; armazena bitmap
 
 	; Sprite 0
 	txa		; X -> A
-        sec		; set carry for subtract
-        sbc PosPlayer0	; local coordinate
-        cmp CurrentSpriteHeight ; in sprite? (usa altura dinâmica)
-        bcc InSprite0	; yes, skip over next
-        lda #0		; not in sprite, load 0
+        sec		; define carry para subtrair
+        sbc PosPlayer0	; coordenada local
+        cmp CurrentSpriteHeight ; usa altura dinâmica
+        bcc InSprite0	
+        lda #0		; não está no sprite, carrega 0
 InSprite0
-	tay		; local coord -> Y
+	tay		; coordenada local -> Y
         lda (CurrentSpritePtr),y	; lookup frame data usando ponteiro
-        sta GRP0	; store bitmap
+        sta GRP0	; armazena bitmap
 
 	dex
         bne Loop
 
 
-; Lower part of the playfield
+; Parte inferior do campo de jogo
 	ldx GameMode
         lda GameModeColors,x
         sta COLUPF
@@ -411,7 +411,7 @@ InSprite0
         sta WSYNC
         
 
-; Clear playfield
+; Limpar campo de jogo
 	lda #0
         sta PF0
         sta PF1
@@ -421,24 +421,23 @@ InSprite0
         sta WSYNC
         
         
-; 29 lines of overscan
+; 29 linhas de overscan
 	TIMER_SETUP 29
         
 
-; Checking collisions between ball and left/right limit
-; Also updating ball positiona and score if necessary
+; Conferindo colisões entre bola e limites da direita e esquerda
+; Atualizando a posição da bola e placar se preciso
 
 	sed
 	lda BallPosX
-        cmp #$9B	; Check if >= 155 (was hitting exactly 157)
+        cmp #$9B	; Confere se >= 155
         bcc NoHitRightWall
-        ;nova funcionalidade começa  aser implementada aqui - parede da direita com gol
+        ; parede da direita com gol
         lda BallPosY
         cmp #60
         bcc BounceRightWall
         cmp #120 
         bcs BounceRightWall
-        ;lógica de pontuação original daqui para baixo
         lda #0
         sta ScoredPlayer0
         lda Score0
@@ -457,7 +456,7 @@ SetWin0
         lda BallDirection
         eor #%01000000
         sta BallDirection
-        ; Sound when scoring
+        ; Som quando pontua
         lda #12
         sta AUDV0
         lda #8
@@ -471,25 +470,24 @@ SetWin0
 
 BounceRightWall:
         lda BallDirection
-        eor #%01000000     ; reverse X direction
+        eor #%01000000     ; reverte posição X
         sta BallDirection
-        jmp NoHitRightWall ; skip scoring
+        jmp NoHitRightWall ; pula pontuação
 
 NoHitRightWall
 
 	lda BallPosX
-        cmp #10		; Check if <= 10 (was hitting exactly 8)
+        cmp #10		; Confere se <= 10
         bcs NoHitLeftWall
         ;Gol da esquerda
         lda BallPosX
-        cmp #10               ; <= 10 ?
-        bcs NoHitLeftWall     ; no
+        cmp #10               ; <= 10 
+        bcs NoHitLeftWall     
         lda BallPosY
         cmp #60
-        bcc BounceLeftWall     ; solid wall
+        bcc BounceLeftWall     ; parede esquerda
         cmp #120
-        bcs BounceLeftWall     ; solid wall
-        ;lógica original
+        bcs BounceLeftWall     ; parede esquerda
         lda #1
         sta ScoredPlayer0
         lda Score1
@@ -508,7 +506,7 @@ SetWin1
         lda BallDirection
         eor #%01000000
         sta BallDirection
-        ; Sound when scoring
+        ; Som quando pontua
         lda #10
         sta AUDV0
         lda #5
@@ -521,36 +519,36 @@ SetWin1
         sta Score1
 BounceLeftWall:
         lda BallDirection
-        eor #%01000000    ; reverse X direction
+        eor #%01000000    ; reverte direção X
         sta BallDirection
-        jmp NoHitLeftWall ; skip scoring
+        jmp NoHitLeftWall ; pula pontuação
 
 NoHitLeftWall
 	cld
         
-; Handles players movement    
+; Gerencia movimento dos jogadores    
 
 	lda CountScoreFrame
         bne NoCheckMovement
 
-; Checks ball movements        
+; Confere movimentos da bola        
         bit BallDirection
         bvc DecX
         
         inc BallPosX
-        ; Check game mode for fast ball (mode 1)
+        ; Confere modo de jogo para bola rápida (modo 2)
         lda GameMode
         cmp #1
         bne XDirection
-        inc BallPosX	; move ball twice as fast in mode 1
+        inc BallPosX	; Move bola 2 vezes mais rápido do que no modo 1
         jmp XDirection
 DecX
 	dec BallPosX
-        ; Check game mode for fast ball (mode 1)
+        ; Confere modo de jogo para bola rápida (modo 1)
         lda GameMode
         cmp #1
         bne XDirection
-        dec BallPosX	; move ball twice as fast in mode 1
+        dec BallPosX	; Move bola 2 vezes mais rápido do que no modo 1
 XDirection
 
 
@@ -565,50 +563,50 @@ YDirection
         lda #%00000010
         sta BallEnable
 
-; Player 0 movement (vertical and horizontal)
+; Movimentação do jogador 0 (vertical e horizontal)
         lda SWCHA
-        and #%00010000  ; Down
+        and #%00010000  ; Baixo
         bne NoMovP0Down
         inc PosPlayer0
         inc PosPlayer0
 NoMovP0Down
 	lda SWCHA
-        and #%00100000  ; Up
+        and #%00100000  ; Cima
         bne NoMovP0Up
         dec PosPlayer0
         dec PosPlayer0
 NoMovP0Up
         lda SWCHA
-        and #%01000000  ; Left
+        and #%01000000  ; Esquerda
         bne NoMovP0Left
         dec HorizPosPlayer0
 NoMovP0Left
         lda SWCHA
-        and #%10000000  ; Right
+        and #%10000000  ; Direita
         bne NoMovP0Right
         inc HorizPosPlayer0
 NoMovP0Right
 
-; Player 1 movement (vertical and horizontal)
+; Moivmentação do jogador 1 (vertical e horizontal)
         lda SWCHA
-        and #%00000001  ; Down
+        and #%00000001  ; Baixo
         bne NoMovP1Down
         inc PosPlayer1
         inc PosPlayer1
 NoMovP1Down
 	lda SWCHA
-        and #%00000010  ; Up
+        and #%00000010  ; Cima
         bne NoMovP1Up
         dec PosPlayer1
         dec PosPlayer1
 NoMovP1Up
         lda SWCHA
-        and #%00000100  ; Left
+        and #%00000100  ; Esquerda
         bne NoMovP1Left
         dec HorizPosPlayer1
 NoMovP1Left
         lda SWCHA
-        and #%00001000  ; Right
+        and #%00001000  ; Direita
         bne NoMovP1Right
         inc HorizPosPlayer1
 NoMovP1Right
@@ -619,7 +617,7 @@ NoCheckMovement
         sta BallEnable
 CheckMovement
 
-; Verifies that players do not move outside the vertical limits
+; Verifica se os jogadores não saíram dos limites verticais
 	lda PosPlayer1
         cmp #2
         bpl P1VertOK1
@@ -632,12 +630,12 @@ P1VertOK1
   	lda #2
         sta PosPlayer0
 P0VertOK1
-      	; Calculate max position based on sprite height
-        ; Max position = 160 - 4 (game field) - CurrentSpriteHeight
+        ; Calcula posição máxima com base na altura do sprite
+        ; Posição máxima = 160 - 4 (campo de jogo) -> CurrentSpriteHeight
         lda #160-4
         sec
         sbc CurrentSpriteHeight
-        sta Temp	; Store max position in Temp
+        sta Temp	; Armazena posição máxima no Temp
         
         lda PosPlayer1
         cmp Temp
@@ -652,8 +650,8 @@ P1VertOK2
         sta PosPlayer0 
 P0VertOK2
 
-; Verifies that players do not move outside the horizontal limits
-; Player 0 (left side): minimum 10, maximum 75 (middle of screen)
+; Verifica se os jogadores não saíram dos limites horizontais
+; Jogador 0 (esquerda): mínimo 10, máximo 75 (meio)
 	lda HorizPosPlayer0
         cmp #10
         bpl P0HorizOK1
@@ -667,7 +665,7 @@ P0HorizOK1
         sta HorizPosPlayer0
 P0HorizOK2
 
-; Player 1 (right side): minimum 85 (middle of screen), maximum 148
+; Jogador 1 (direita): mínimo 85, máximo 148 (meio) 
 	lda HorizPosPlayer1
         cmp #85
         bpl P1HorizOK1
@@ -681,7 +679,7 @@ P1HorizOK1
         sta HorizPosPlayer1
 P1HorizOK2
 
-; Checking collisions between ball and players
+; Confere colisões entre bola e jogadores 
 
 	lda BallDirCounter
         bne DoNotCheckPlayerHitBall
@@ -713,11 +711,11 @@ DoNotCheckPlayerHitBall
 	dec BallDirCounter
 NoBallCounterDec
 
-	; Reset collition status
+  ; Reseta status de colisão
         sta CXCLR
 
 
-; Checking collisions between ball and top/bottom wall
+; Confere colisões entre bola e teto/chão
 
 	lda BallPosY
         cmp #154
@@ -762,55 +760,55 @@ ScoreCheckCompleted
 
         TIMER_WAIT
         
-; total = 262 lines, go to next frame
+; total = 262 linhas -> ir para próximo quadro
         jmp NextFrame
 
 
-; Fetches bitmap data for two digits of a
-; BCD-encoded number, storing it in addresses
-; FontBuf+x to FontBuf+4+x.
+; Busca dado do bitmap para 2 dígitos
+; de um número BCD-codificado, armazenando em seus endereços 
+; FontBuf+x para FontBuf+4+x 
 GetBCDBitmap subroutine
-; First fetch the bytes for the 1st digit
-	pha		; save original BCD number
-        and #$0F	; mask out the least significant digit
+; Primeiro, busca os bytes do primeiro dígito 
+	pha		; salva número BCD original
+        and #$0F	; mascara o bit menos significante
         sta Temp
         asl
         asl
-        adc Temp	; multiply by 5
+        adc Temp	; multiplica por 5
         tay		; -> Y
         lda #5
-        sta Temp	; count down from 5
+        sta Temp	; contagem regressiva a partir do 5
 .loop1
         lda DigitsBitmap,y
-        and #$0F	; mask out leftmost digit
-        sta FontBuf,x	; store leftmost digit
+        and #$0F	; mascara digito mais a esquerda
+        sta FontBuf,x	; armazena digito mais a esquerda
         iny
         inx
         dec Temp
         bne .loop1
-; Now do the 2nd digit
-        pla		; restore original BCD number
+; Segundo dígito
+        pla		; restaura número BCD original
         lsr
         lsr
         lsr
-        lsr		; shift right by 4 (in BCD, divide by 10)
+        lsr		; desloca para direita 4 (divide por 10 em BCD)
         sta Temp
         asl
         asl
-        adc Temp	; multiply by 5
+        adc Temp	; multiplica por 5
         tay		; -> Y
         dex
         dex
         dex
         dex
-        dex		; subtract 5 from X (reset to original)
+        dex		; subtrai 5 de X (reset para o original)
         lda #5
-        sta Temp	; count down from 5
+        sta Temp	; contagem regressiva a partir do  5
 .loop2
         lda DigitsBitmap,y
-        and #$F0	; mask out leftmost digit
-        ora FontBuf,x	; combine left and right digits
-        sta FontBuf,x	; store combined digits
+        and #$F0	; mascara dígito mais a esquerda
+        ora FontBuf,x	; combina dígitos da esquerda e direita
+        sta FontBuf,x	; armazena dígitos combinados
         iny
         inx
         dec Temp
@@ -819,19 +817,19 @@ GetBCDBitmap subroutine
 
 	org $F700
 
-; Game mode colors for visual feedback
+; Cores de modo de jogo para retorno visual
 GameModeColors
-        .byte $C2	; Mode 0: Normal - green
-        .byte $46	; Mode 1: Fast ball - red  
-        .byte $63	; Mode 2: Small paddles - purple
+        .byte $C2	; Modo 0: Normal - verde
+        .byte $46	; Modo 1: Bola rápida - vermelho  
+        .byte $63	; Modo 2: Paddles pequenos - roxo
 
-; Game field line colors for each mode
+; Core do campo de jogo para cada modo
 GameFieldLineColors
-        .byte $0D       ; Mode 0: Normal - white
-        .byte $28	; Mode 1: Fast ball - orange
-        .byte $EA	; Mode 2: Small paddles - green
+        .byte $0D       ; Modo 0: Normal - branco
+        .byte $28	; Mode 1: Bola rápida - laranja
+        .byte $EA	; Mode 2: Paddles pequenos - verde
 
-; Bitmap pattern for digits
+; Padrão do bitmap para dígitos
 DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
         .byte $EE,$AA,$AA,$AA,$EE
         .byte $22,$22,$22,$22,$22
@@ -846,7 +844,7 @@ DigitsBitmap ;;{w:8,h:5,count:10,brev:1};;
         
 ;---Graphics Data from PlayerPal 2600---
 
-; Player graphics data - MODO Small (30 linhas)
+; Dados gráficos do jogador - MODO Small (30 linhas)
 PlayerSprite
         .byte #%00000000;-- linha 0
         .byte #%00011000;-- linha 1
@@ -874,7 +872,7 @@ PlayerSprite
         .byte #%00111100;-- linha 28
         .byte #%00011000;-- linha 29
 
-; Player graphics data - MODO Normal PADDLES (42 linhas - sem afunilamento)
+; Dados gráficos do jogador - MODO Normal PADDLES (42 linhas - sem afunilamento)
 PlayerSpriteBig
         .byte #%00000000;-- linha 0
         .byte #%00011000;-- linha 1
@@ -926,44 +924,44 @@ PlayerSpriteBig
 ; X = player number (0 or 1)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; After this subroutine it is necessary to use
+; Depois dessa subrotina é necessário usar
 ;
 ; 	sta WSYNC
 ; 	sta HMOVE
 ;
-; to correctly set the parameters
-; Then better to set (after waitin 26 cpu cycles)
+; para definir os parâmetros corretamente
+; então melhor definir (depois de esperar 26 ciclos de CPU)
 ;
 ; 	sta HMCLR
 ;
-; so next sta HMOVE will not impact the position
+; então, o próximo sta HMOVE não impactará a posição
 
-; Everything should be in the same page
-; otherwise the timing is not correct
+; Tudo deve estar na mesma página 
+; do contrário, o timing vai falhar
 
-; The entire routine is positioned in memory at the end just to
-; assure that the branch is not moving to a different page
-; Total size of the routine 18 bytes.
+; Toda a rotina é posicionada na memória ao final para
+; garantir que a branch não está se movendo para página errada
+; tamanho total da rotina -> 18 bytes
 
 SetHorizPos SUBROUTINE
-	sec		; set carry flag
-	sta WSYNC	; start a new line
+	sec		; define flag do carry
+	sta WSYNC	; começa nova linha
 .DivideLoop
-	sbc #15		; subtract 15
-	bcs .DivideLoop	; branch until negative
-	eor #7		; calculate fine offset
+	sbc #15		; subtrai 15
+	bcs .DivideLoop	; branch até ser negativo
+	eor #7		; calcula deslocamento ok
         asl
         asl
         asl
         asl
-	sta HMP0,x	; set fine offset
-	sta RESP0,x	; fix coarse position
-	rts		; return to caller        
+	sta HMP0,x	; define offset ok
+	sta RESP0,x	; corrige posição
+	rts		; retorna para o caller
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Epilogue
+; Epílogo
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 	org $f7fc
-        .word Start	; reset vectora
+        .word Start	; reseta vectora
         .word Start	; BRK vectordaw
